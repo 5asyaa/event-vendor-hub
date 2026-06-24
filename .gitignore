@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+*/node_modules/
+**/node_modules/
+
+# Environment variables - JANGAN pernah di-commit!
+.env
+**/.env
+
+# Uploads (file lokal)
+**/uploads/*
+!**/uploads/.gitkeep
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+desktop.ini
+*.stackdump
+
+# OS files
+.DS_Store
+desktop.ini
+*.stackdump
+
+# IDE
+.vscode/
+.kiro/

@@ -1,0 +1,11 @@
+{
+  "name": "e-bisnis",
+  "version": "1.0.0",
+  "scripts": {
+    "start-all": "concurrently \"cd microservices/auth-service && node server.js\" \"cd microservices/vendor-service && node server.js\" \"cd microservices/booking-service && node server.js\" \"cd microservices/payment-service && node server.js\" \"cd microservices/review-service && node server.js\" \"cd microservices/api-gateway && node server.js\""
+  },
+  "dependencies": {
+    "concurrently": "^9.2.1",
+    "cors": "^2.8.6"
+  }
+}
