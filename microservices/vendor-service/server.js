@@ -25,7 +25,7 @@ app.use("/vendors", vendorRoutes);
 // SERVICE ENDPOINTS
 app.use("/services", serviceRoutes);
 
-const PORT = process.env.PORT || 3002;
+const PORT = 3002;
 
 app.listen(PORT, () => {
   console.log(`Vendor Service running on port ${PORT}`);
