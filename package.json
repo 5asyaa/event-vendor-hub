@@ -6,7 +6,15 @@
     "start-all": "concurrently \"cd microservices/auth-service && node server.js\" \"cd microservices/vendor-service && node server.js\" \"cd microservices/booking-service && node server.js\" \"cd microservices/payment-service && node server.js\" \"cd microservices/review-service && node server.js\" \"cd microservices/api-gateway && node server.js\""
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "concurrently": "^9.2.1",
-    "cors": "^2.8.6"
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "http-proxy-middleware": "^2.0.6",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.2.0",
+    "mysql2": "^3.22.4",
+    "xendit-node": "^7.0.0"
   }
 }
