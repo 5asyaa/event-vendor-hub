@@ -229,8 +229,9 @@
             })
         );
 
-        // Langsung arahkan ke pesanan saya tanpa alert
-        window.location.href = `pesanan-saya.html`;
+        // Arahkan langsung ke pembayaran dengan id_booking yang baru dibuat
+        // (bukan ke pesanan-saya agar user tidak bisa buat booking baru sebelum bayar)
+        window.location.href = `pembayaran.html?id_booking=${result.id_booking}`;
 
     } catch (error) {
 
