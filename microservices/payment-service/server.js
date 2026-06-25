@@ -30,7 +30,7 @@ app.get("/", (req, res) => {
 app.use("/payments", paymentRoutes);
 app.use("/test", testRoutes);
 
-const PORT = 3004;
+const PORT = process.env.PORT || 3004;
 
 app.listen(PORT, () => {
   console.log(`Payment Service running on port ${PORT}`);

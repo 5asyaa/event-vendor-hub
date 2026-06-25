@@ -17,7 +17,7 @@ app.get("/", (req, res) => {
 
 app.use("/reviews", reviewRoutes);
 
-const PORT = 3005;
+const PORT = process.env.PORT || 3005;
 
 app.listen(PORT, () => {
   console.log(`Review Service running on port ${PORT}`);
