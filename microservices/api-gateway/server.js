@@ -9,19 +9,26 @@ const fs = require("fs");
 app.use(cors());
 
 // Serve static frontend files
-const frontendPath = path.resolve(
-  __dirname,
-  "../../frontend/views/public"
-);
+const frontendPath = path.resolve(__dirname, "../../frontend/views");
 
-console.log("__dirname =", __dirname);
+console.log("__dirname   =", __dirname);
 console.log("frontendPath =", frontendPath);
-console.log("exists =", fs.existsSync(frontendPath));
+console.log("exists       =", fs.existsSync(frontendPath));
 
-app.use(express.static(frontendPath));
+// Serve each sub-folder at its matching URL prefix so existing links keep working:
+//   /             → views/public/index.html
+//   /login.html   → views/public/login.html
+//   /customer/... → views/customer/...
+//   /vendor/...   → views/vendor/...
+//   /admin/...    → views/admin/...
+app.use(express.static(path.join(frontendPath, "public")));
+app.use("/customer", express.static(path.join(frontendPath, "customer")));
+app.use("/vendor",   express.static(path.join(frontendPath, "vendor")));
+app.use("/admin",    express.static(path.join(frontendPath, "admin")));
 
+// Root → public/index.html
 app.get("/", (req, res) => {
-  res.sendFile(path.join(frontendPath, "index.html"));
+  res.sendFile(path.join(frontendPath, "public", "index.html"));
 });
 
 // Service URLs — pakai env variable di production, fallback ke localhost untuk dev
