@@ -20,6 +20,29 @@ router.get("/", (req, res) => {
   );
 });
 
+// GET /services/:id
+router.get("/:id", (req, res) => {
+  const id = req.params.id;
+  db.query(
+    "SELECT * FROM services WHERE id_service = ?",
+    [id],
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({
+          message: "Gagal mengambil data service",
+          error: err
+        });
+      }
+      if (result.length === 0) {
+        return res.status(404).json({
+          message: "Service tidak ditemukan"
+        });
+      }
+      res.json(result[0]);
+    }
+  );
+});
+
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
