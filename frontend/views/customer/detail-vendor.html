@@ -116,8 +116,6 @@
                 <button onclick="logout()" class="text-sm font-semibold text-red-500 hover:text-red-700 transition flex items-center gap-1">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
                 </button>`;
-        } else {
-            authContainer.querySelector('a[href="../login.html"]').href = '../public/login.html';
         }
 
         const vendorId     = new URLSearchParams(window.location.search).get("id");
