@@ -156,7 +156,7 @@
                 const headers = { 'Authorization': `Bearer ${token}` };
 
                 // 1. Cari vendor yang sesuai user login
-                const vendors       = await fetch("http://localhost:3000/vendors", { headers }).then(r => r.json());
+                const vendors       = await fetch(`${window.location.origin}/vendors`, { headers }).then(r => r.json());
                 const currentVendor = vendors.find(v => Number(v.id_user) === Number(session.id));
                 if (!currentVendor) {
                     container.innerHTML = `<p class="text-xs text-red-500 col-span-2">Profil vendor tidak ditemukan.</p>`;
@@ -164,11 +164,11 @@
                 }
 
                 // 2. Ambil layanan & booking milik vendor ini
-                const services   = await fetch("http://localhost:3000/services", { headers }).then(r => r.json());
+                const services   = await fetch(`${window.location.origin}/services`, { headers }).then(r => r.json());
                 vendorSvcs       = services.filter(s => Number(s.id_vendor) === Number(currentVendor.id_vendor));
                 const svcIds     = vendorSvcs.map(s => Number(s.id_service));
 
-                const rawBookings = await fetch("http://localhost:3000/bookings", { headers }).then(r => r.json());
+                const rawBookings = await fetch(`${window.location.origin}/bookings`, { headers }).then(r => r.json());
                 const sorted      = rawBookings
                     .filter(b => svcIds.includes(Number(b.id_service)))
                     .sort((a, b) => b.id_booking - a.id_booking);
@@ -183,7 +183,7 @@
                 await Promise.all(sorted.map(async (b) => {
                     if (userCache[b.id_user] !== undefined) return;
                     try {
-                        const u = await fetch(`http://localhost:3000/auth/users/${b.id_user}`);
+                        const u = await fetch(`${window.location.origin}/auth/users/${b.id_user}`);
                         if (u.ok) { const ud = await u.json(); userCache[b.id_user] = ud.nama || null; }
                     } catch(e) {}
                     if (userCache[b.id_user] === undefined) userCache[b.id_user] = null;
@@ -367,7 +367,7 @@
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Memproses...';
 
-                const res = await fetch(`http://localhost:3000/bookings/${id_booking}/${action}`, {
+                const res = await fetch(`${window.location.origin}/bookings/${id_booking}/${action}`, {
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json",

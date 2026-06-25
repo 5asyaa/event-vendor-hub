@@ -206,7 +206,7 @@
                 _session      = JSON.parse(localStorage.getItem('session') || '{}');
                 const token   = _session.token || '';
 
-                const response = await fetch("http://localhost:3000/bookings", {
+                const response = await fetch(`${window.location.origin}/bookings`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (!response.ok) throw new Error("Gagal mengambil data");
@@ -234,9 +234,9 @@
                 // Ambil semua data services, vendors & reviews sekali saja
                 try {
                     [_allServices, _allVendors, _allReviews] = await Promise.all([
-                        fetch("http://localhost:3000/services").then(r => r.json()),
-                        fetch("http://localhost:3000/vendors").then(r => r.json()),
-                        fetch("http://localhost:3000/reviews").then(r => r.json())
+                        fetch(`${window.location.origin}/services`).then(r => r.json()),
+                        fetch(`${window.location.origin}/vendors`).then(r => r.json()),
+                        fetch(`${window.location.origin}/reviews`).then(r => r.json())
                     ]);
                 } catch(e) { console.error("Gagal load services/vendors/reviews:", e); }
 
@@ -386,7 +386,7 @@
             let totalHarga       = Number(booking.total_harga) || 0;
 
             try {
-                const paymentRes = await fetch(`http://localhost:3000/payments/booking/${booking.id_booking}`, {
+                const paymentRes = await fetch(`${window.location.origin}/payments/booking/${booking.id_booking}`, {
                     headers: { 'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('session')||'{}').token||'')}` }
                 });
                 if (paymentRes.ok) {

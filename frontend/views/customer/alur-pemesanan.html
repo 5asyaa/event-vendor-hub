@@ -198,7 +198,7 @@
         const token = s.token || '';
 
         const response = await fetch(
-            "http://localhost:3000/bookings",
+            `${window.location.origin}/bookings`,
             {
                 method: "POST",
                 headers: {

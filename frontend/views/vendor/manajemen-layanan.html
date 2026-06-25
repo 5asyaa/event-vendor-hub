@@ -47,6 +47,8 @@
     </main>
 
     <script>
+        const API = window.location.origin;
+
         document.addEventListener("DOMContentLoaded", async function() {
             const session = JSON.parse(localStorage.getItem('session') || '{}');
             if (!session.isLoggedIn || session.role !== 'vendor') {
@@ -58,7 +60,7 @@
             const headers = { 'Authorization': `Bearer ${token}` };
 
             try {
-                const vendors = await fetch("http://localhost:3000/vendors", { headers }).then(r => r.json());
+                const vendors = await fetch(`${API}/vendors`, { headers }).then(r => r.json());
                 const currentVendor = vendors.find(v => v.id_user == session.id);
 
                 if (!currentVendor) {
@@ -67,7 +69,7 @@
                     return;
                 }
 
-                const services = await fetch("http://localhost:3000/services", { headers }).then(r => r.json());
+                const services = await fetch(`${API}/services`, { headers }).then(r => r.json());
                 const vendorServices = services.filter(s => s.id_vendor == currentVendor.id_vendor);
 
                 const tableBody = document.getElementById('services-table-body');

@@ -2,7 +2,7 @@
 // AUTH MODEL - Komunikasi ke auth-service
 // ==========================================
 
-const AUTH_BASE_URL = 'http://localhost:3000/auth';
+const AUTH_BASE_URL = window.location.origin + '/auth';
 
 const AuthModel = {
 

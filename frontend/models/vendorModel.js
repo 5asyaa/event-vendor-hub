@@ -2,7 +2,7 @@
 // VENDOR MODEL - Komunikasi ke vendor-service & service data
 // ==========================================
 
-const VENDOR_BASE_URL = 'http://localhost:3000';
+const VENDOR_BASE_URL = window.location.origin;
 
 const VendorModel = {
 

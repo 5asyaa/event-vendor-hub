@@ -226,7 +226,7 @@
             };
 
             try {
-                const res = await fetch('http://localhost:3000/reviews', {
+                const res = await fetch(`${window.location.origin}/reviews`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

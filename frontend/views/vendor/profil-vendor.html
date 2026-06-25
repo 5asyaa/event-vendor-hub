@@ -149,7 +149,7 @@
 </div>
 
 <script>
-const API = 'http://localhost:3000';
+const API = window.location.origin;
 let currentVendor = null;
 
 function doLogout() { localStorage.removeItem('session'); window.location.href = '../public/login.html'; }

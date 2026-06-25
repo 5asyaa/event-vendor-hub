@@ -76,19 +76,19 @@
 
             // Ambil detail data secara dinamis dari database sesuai booking ID
             if (id_booking) {
-                fetch(`http://localhost:3000/bookings/${id_booking}`, {
+                fetch(`${window.location.origin}/bookings/${id_booking}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 })
                     .then(res => res.json())
                     .then(bookingData => {
                         if (bookingData && bookingData.id_service) {
-                            fetch(`http://localhost:3000/services`)
+                            fetch(`${window.location.origin}/services`)
                                 .then(res => res.json())
                                 .then(services => {
                                     const service = services.find(s => s.id_service == bookingData.id_service);
                                     if (service) {
                                         document.getElementById('package-name').innerText = service.nama_paket;
-                                        fetch(`http://localhost:3000/vendors/${service.id_vendor}`)
+                                        fetch(`${window.location.origin}/vendors/${service.id_vendor}`)
                                             .then(res => res.json())
                                             .then(vendor => {
                                                 if (vendor) {
@@ -104,7 +104,7 @@
             async function getStatus() {
                 try {
                     // Fetch booking detail
-                    const bookingRes = await fetch(`http://localhost:3000/bookings/${id_booking}`, {
+                    const bookingRes = await fetch(`${window.location.origin}/bookings/${id_booking}`, {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
                     if (bookingRes.ok) {
@@ -113,7 +113,7 @@
                     }
 
                     // Fetch payment detail
-                    const paymentRes = await fetch(`http://localhost:3000/payments/booking/${id_booking}`, {
+                    const paymentRes = await fetch(`${window.location.origin}/payments/booking/${id_booking}`, {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
                     if (paymentRes.ok) {

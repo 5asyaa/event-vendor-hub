@@ -130,7 +130,7 @@
             let idVendor = null;
             try {
                 // Fetch all vendors to find current vendor's ID
-                const vendors = await fetch("http://localhost:3000/vendors").then(r => r.json());
+                const vendors = await fetch(`${window.location.origin}/vendors`).then(r => r.json());
                 const currentVendor = vendors.find(v => v.id_user == session.id);
 
                 if (!currentVendor) {
@@ -166,7 +166,7 @@
                 }
 
                 try {
-                    const response = await fetch("http://localhost:3000/services", {
+                    const response = await fetch(`${window.location.origin}/services`, {
                         method: "POST",
                         headers: {
                             "Authorization": `Bearer ${session.token || ''}`

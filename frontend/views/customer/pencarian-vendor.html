@@ -286,11 +286,11 @@
             });
 
             // Fetch awal
-            fetch("http://localhost:3000/vendors/approved")
+            fetch(`${window.location.origin}/vendors/approved`)
                 .then(res => res.json())
                 .then(async vendors => {
                     allVendors = vendors;
-                    try { allServices = await fetch("http://localhost:3000/services").then(r => r.json()); }
+                    try { allServices = await fetch(`${window.location.origin}/services`).then(r => r.json()); }
                     catch(e) { console.error("Gagal load services:", e); }
                     applyFilters();
                 })

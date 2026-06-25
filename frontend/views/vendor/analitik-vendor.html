@@ -75,7 +75,7 @@
             const headers = { 'Authorization': `Bearer ${token}` };
 
             try {
-                const vendorsRes = await fetch("http://localhost:3000/vendors", { headers });
+                const vendorsRes = await fetch(`${window.location.origin}/vendors`, { headers });
                 const vendors = await vendorsRes.json();
                 const currentVendor = vendors.find(v => Number(v.id_user) === Number(session.id));
 
@@ -86,12 +86,12 @@
 
                 const idVendor = currentVendor.id_vendor;
 
-                const servicesRes = await fetch("http://localhost:3000/services", { headers });
+                const servicesRes = await fetch(`${window.location.origin}/services`, { headers });
                 const services = await servicesRes.json();
                 const vendorServices = services.filter(s => Number(s.id_vendor) === Number(idVendor));
                 const vendorServiceIds = vendorServices.map(s => Number(s.id_service));
 
-                const bookingsRes = await fetch("http://localhost:3000/bookings", { headers });
+                const bookingsRes = await fetch(`${window.location.origin}/bookings`, { headers });
                 const bookings = await bookingsRes.json();
                 const vendorBookings = bookings.filter(b => vendorServiceIds.includes(Number(b.id_service)));
 
@@ -104,7 +104,7 @@
                 document.getElementById('stat-revenue').innerText = `Rp ${totalRevenue.toLocaleString('id-ID')}`;
                 document.getElementById('stat-pending-balance').innerText = `Rp ${pendingBalance.toLocaleString('id-ID')}`;
 
-                const reviewsRes = await fetch("http://localhost:3000/reviews");
+                const reviewsRes = await fetch(`${window.location.origin}/reviews`);
                 const reviews = await reviewsRes.json();
                 const vendorReviews = reviews.filter(rev => Number(rev.id_vendor) === Number(idVendor));
 
@@ -126,7 +126,7 @@
                     for (const rev of vendorReviews.slice(0, 10)) { // Ambil maks 10 ulasan terbaru
                         let customerName = `Pelanggan #${rev.id_user}`;
                         try {
-                            const userRes = await fetch(`http://localhost:3000/auth/users/${rev.id_user}`);
+                            const userRes = await fetch(`${window.location.origin}/auth/users/${rev.id_user}`);
                             if (userRes.ok) {
                                 const userData = await userRes.json();
                                 customerName = userData.nama || customerName;

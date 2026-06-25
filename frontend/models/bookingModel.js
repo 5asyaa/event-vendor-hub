@@ -2,7 +2,7 @@
 // BOOKING MODEL - Komunikasi ke booking-service
 // ==========================================
 
-const BOOKING_BASE_URL = 'http://localhost:3000';
+const BOOKING_BASE_URL = window.location.origin;
 
 const BookingModel = {
 

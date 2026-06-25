@@ -3,7 +3,7 @@
 // menggunakan fungsi ini agar token JWT otomatis disertakan
 // ==========================================
 
-const API_BASE = 'http://localhost:3000';
+const API_BASE = window.location.origin;
 
 /**
  * Fetch dengan token JWT otomatis dari localStorage session

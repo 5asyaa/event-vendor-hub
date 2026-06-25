@@ -77,7 +77,7 @@
 </main>
 
 <script>
-const API = 'http://localhost:3000';
+const API = window.location.origin;
 
 function doLogout() {
     localStorage.removeItem('session');
