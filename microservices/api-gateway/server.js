@@ -8,7 +8,7 @@ const path = require("path");
 app.use(cors());
 
 // Serve static frontend files
-app.use(express.static(path.join(__dirname, "../../../frontend/views/public")));
+app.use(express.static(path.resolve(__dirname, "../../../frontend/views/public")));
 
 app.get("/", (req, res) => {
   res.sendFile(
