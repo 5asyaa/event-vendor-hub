@@ -5,7 +5,7 @@ const mysql = require("mysql2");
 console.log("Payment DB Config:", {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
-  database: process.env.DB_NAME
+  database: process.env.PAYMENT_DB_NAME
 });
 
 const db = mysql.createConnection({
