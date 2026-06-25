@@ -9,7 +9,10 @@ const fs = require("fs");
 app.use(cors());
 
 // Serve static frontend files
-const frontendPath = path.resolve(__dirname, "../../../frontend/views/public");
+const frontendPath = path.resolve(
+  __dirname,
+  "../../frontend/views/public"
+);
 
 console.log("__dirname =", __dirname);
 console.log("frontendPath =", frontendPath);
