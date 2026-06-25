@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Platform - EventVendorHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .interactive-card { transition: all 0.3s ease; }
+        .interactive-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body class="bg-[#f8f9fc] text-slate-800 min-h-screen flex">
+
+<!-- SIDEBAR -->
+<aside class="w-64 bg-[#0a1120] text-gray-400 p-6 flex flex-col justify-between hidden md:flex min-h-screen sticky top-0">
+    <div class="space-y-8">
+        <div><span class="block font-bold text-lg text-white tracking-tight">EventVendorHub</span><span class="text-[10px] uppercase tracking-wider text-gray-500 block mt-0.5">Admin Portal</span></div>
+        <nav class="space-y-1 text-sm font-medium">
+            <a href="dashboard-admin.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+            <a href="verifikasi-vendor.html" class="flex items-center justify-between px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition">
+                <span class="flex items-center gap-3"><i class="fa-regular fa-id-card"></i> Verifikasi Vendor</span>
+                <span id="sidebar-vendor-count" class="bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">...</span>
+            </a>
+            <a href="kelola-user.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-users"></i> Kelola User</a>
+            <a href="pesanan-masuk.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-wallet"></i> Pesanan Masuk</a>
+            <a href="laporan-platform.html" class="flex items-center gap-3 bg-orange-500 text-white px-4 py-3 rounded-xl shadow-md font-semibold"><i class="fa-solid fa-chart-line"></i> Laporan</a>
+        </nav>
+    </div>
+    <div class="space-y-3">
+        <a href="profil-admin.html" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition"><i class="fa-solid fa-user"></i> Profil Saya</a>
+        <a href="#" onclick="doLogout()" class="flex items-center gap-3 px-4 py-2 text-sm hover:text-red-400 hover:bg-slate-900/50 rounded-lg transition"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+    </div>
+</aside>
+
+<main class="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full space-y-8">
+
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 class="text-xl font-black text-slate-900 tracking-tight">Laporan & Analitik</h1>
+            <p class="text-xs text-gray-400 mt-0.5">Pantau performa dan tren pendapatan platform secara real-time.</p>
+        </div>
+        <button onclick="initLaporan()" class="flex items-center gap-2 bg-white border border-gray-200 text-slate-700 font-bold text-xs py-2 px-4 rounded-xl hover:bg-gray-50 transition shadow-sm">
+            <i class="fa-solid fa-rotate-right"></i> Refresh
+        </button>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div class="bg-white p-6 rounded-2xl border border-gray-100 interactive-card">
+            <span class="text-xs text-gray-500 font-semibold block">Total Pendapatan (Lunas)</span>
+            <span id="stat-revenue" class="text-2xl font-black text-slate-900 block mt-2">—</span>
+            <span id="stat-revenue-sub" class="text-[11px] text-emerald-600 font-bold mt-1 block">Dari booking lunas</span>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-gray-100 interactive-card">
+            <span class="text-xs text-gray-500 font-semibold block">Pending Pencairan</span>
+            <span id="stat-pending-rev" class="text-2xl font-black text-slate-900 block mt-2">—</span>
+            <span class="text-[11px] text-orange-500 font-bold mt-1 block">Booking dikonfirmasi</span>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-gray-100 interactive-card">
+            <span class="text-xs text-gray-500 font-semibold block">Total Transaksi</span>
+            <span id="stat-transactions" class="text-2xl font-black text-slate-900 block mt-2">—</span>
+            <span class="text-[11px] text-gray-400 font-bold mt-1 block">Confirmed + Completed</span>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-gray-100 interactive-card">
+            <span class="text-xs text-gray-500 font-semibold block">Rata-rata Nilai Pesanan</span>
+            <span id="stat-avg" class="text-2xl font-black text-slate-900 block mt-2">—</span>
+            <span class="text-[11px] text-gray-400 font-bold mt-1 block">Per booking</span>
+        </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Tren booking -->
+        <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="font-bold text-sm text-slate-900">Tren Booking per Bulan</h3>
+                <select id="chart-year" onchange="updateChart()" class="text-xs border border-gray-200 rounded-lg py-1.5 px-3 bg-gray-50 text-gray-600 outline-none">
+                    <!-- opsi tahun diisi JS -->
+                </select>
+            </div>
+            <div class="h-64"><canvas id="laporanChart"></canvas></div>
+        </div>
+
+        <!-- Distribusi Status -->
+        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+            <h3 class="font-bold text-sm text-slate-900 mb-5">Distribusi Status Booking</h3>
+            <div class="h-48"><canvas id="statusChart"></canvas></div>
+            <div id="status-legend" class="mt-4 space-y-2"></div>
+        </div>
+    </div>
+
+    <!-- TOP VENDOR TABLE -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="p-5 border-b border-gray-100 flex justify-between items-center">
+            <h3 class="font-bold text-sm text-slate-900">Top 10 Vendor Berdasarkan Booking</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100">
+                        <th class="py-3 px-6">#</th>
+                        <th class="py-3 px-6">Vendor</th>
+                        <th class="py-3 px-6">Kategori</th>
+                        <th class="py-3 px-6">Total Booking</th>
+                        <th class="py-3 px-6">Total Pendapatan</th>
+                        <th class="py-3 px-6">Rating</th>
+                    </tr>
+                </thead>
+                <tbody id="top-vendor-body" class="divide-y divide-gray-100 text-gray-600 font-medium">
+                    <tr><td colspan="6" class="py-8 text-center text-gray-400 text-xs">Memuat...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- TRANSAKSI TERBARU -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="p-5 border-b border-gray-100">
+            <h3 class="font-bold text-sm text-slate-900">10 Booking Terbaru</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100">
+                        <th class="py-3 px-5">ID</th>
+                        <th class="py-3 px-5">Tanggal Event</th>
+                        <th class="py-3 px-5">Lokasi</th>
+                        <th class="py-3 px-5">Total Harga</th>
+                        <th class="py-3 px-5">Status</th>
+                        <th class="py-3 px-5">Pembayaran</th>
+                    </tr>
+                </thead>
+                <tbody id="recent-booking-body" class="divide-y divide-gray-100 text-gray-600 font-medium">
+                    <tr><td colspan="6" class="py-8 text-center text-gray-400 text-xs">Memuat...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-6 right-6 z-50 hidden">
+    <div id="toast-inner" class="flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg text-sm font-semibold text-white">
+        <i id="toast-icon"></i><span id="toast-text"></span>
+    </div>
+</div>
+
+<script>
+const API = 'http://localhost:3000';
+let bookingsData = [];
+let servicesData = [];
+let vendorsData  = [];
+let chartInstance = null;
+let statusChartInstance = null;
+
+function doLogout() { localStorage.removeItem('session'); window.location.href = '../public/login.html'; }
+
+function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    document.getElementById('toast-inner').style.background = type === 'success' ? '#16a34a' : '#dc2626';
+    document.getElementById('toast-icon').className = type === 'success' ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-exclamation';
+    document.getElementById('toast-text').textContent = msg;
+    t.classList.remove('hidden');
+    setTimeout(() => t.classList.add('hidden'), 3000);
+}
+
+function formatRupiah(n) {
+    if (n >= 1e9) return 'Rp ' + (n / 1e9).toFixed(1) + 'M';
+    if (n >= 1e6) return 'Rp ' + (n / 1e6).toFixed(1) + 'jt';
+    return 'Rp ' + Number(n).toLocaleString('id-ID');
+}
+
+function updateChart() {
+    const year = parseInt(document.getElementById('chart-year').value);
+    const monthNames = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+    const monthCount = Array(12).fill(0);
+
+    bookingsData.forEach(b => {
+        const d = new Date(b.tanggal_event);
+        if (!isNaN(d) && d.getFullYear() === year) {
+            monthCount[d.getMonth()]++;
+        }
+    });
+
+    if (chartInstance) chartInstance.destroy();
+    const ctx = document.getElementById('laporanChart').getContext('2d');
+    chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: monthNames,
+            datasets: [{
+                label: 'Jumlah Booking',
+                data: monthCount,
+                backgroundColor: monthCount.map((_, i) => i === new Date().getMonth() && year === new Date().getFullYear() ? '#f97316' : '#cbd5e1'),
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { ticks: { precision: 0, stepSize: 1 } }, x: { grid: { display: false } } }
+        }
+    });
+}
+
+async function initLaporan() {
+    try {
+        const session = JSON.parse(localStorage.getItem('session') || '{}');
+        if (!session.isLoggedIn || session.role !== 'admin') { window.location.href = '../public/login.html'; return; }
+
+        const token   = session.token || '';
+        const headers = { 'Authorization': `Bearer ${token}` };
+
+        const [bRes, sRes, vRes] = await Promise.all([
+            fetch(`${API}/bookings`, { headers }),
+            fetch(`${API}/services`, { headers }),
+            fetch(`${API}/vendors`,  { headers })
+        ]);
+
+        if (bRes.status === 401) { localStorage.removeItem('session'); window.location.href = '../public/login.html'; return; }
+
+        [bookingsData, servicesData, vendorsData] = await Promise.all([
+            bRes.ok ? bRes.json() : [],
+            sRes.ok ? sRes.json() : [],
+            vRes.ok ? vRes.json() : []
+        ]);
+
+        document.getElementById('sidebar-vendor-count').textContent = vendorsData.length;
+
+        // ── Stat Cards ──────────────────────────────────────────────────────
+        const lunas     = bookingsData.filter(b => b.status_pembayaran === 'lunas');
+        const pending   = bookingsData.filter(b => b.status === 'confirmed' && b.status_pembayaran !== 'lunas');
+        const transaksi = bookingsData.filter(b => b.status === 'confirmed' || b.status === 'completed');
+
+        const totalRevenue  = lunas.reduce((s, b) => s + Number(b.total_harga || 0), 0);
+        const pendingRev    = pending.reduce((s, b) => s + Number(b.total_harga || 0), 0);
+        const avgOrder      = bookingsData.length > 0 ? totalRevenue / bookingsData.length : 0;
+
+        document.getElementById('stat-revenue').textContent      = formatRupiah(totalRevenue);
+        document.getElementById('stat-pending-rev').textContent  = formatRupiah(pendingRev);
+        document.getElementById('stat-transactions').textContent = transaksi.length.toLocaleString('id-ID');
+        document.getElementById('stat-avg').textContent          = formatRupiah(avgOrder);
+
+        // ── Chart Year Selector ─────────────────────────────────────────────
+        const years = [...new Set(bookingsData.map(b => new Date(b.tanggal_event).getFullYear()).filter(y => !isNaN(y)))].sort((a,b) => b-a);
+        if (years.length === 0) years.push(new Date().getFullYear());
+        const yearSel = document.getElementById('chart-year');
+        yearSel.innerHTML = years.map(y => `<option value="${y}">${y}</option>`).join('');
+        updateChart();
+
+        // ── Status Donut Chart ──────────────────────────────────────────────
+        const statusCount = { pending: 0, confirmed: 0, completed: 0, rejected: 0 };
+        bookingsData.forEach(b => { if (statusCount[b.status] !== undefined) statusCount[b.status]++; });
+        const statusColors = ['#f97316','#16a34a','#2563eb','#dc2626'];
+        const statusLabels = ['Pending','Dikonfirmasi','Selesai','Ditolak'];
+
+        if (statusChartInstance) statusChartInstance.destroy();
+        const ctx2 = document.getElementById('statusChart').getContext('2d');
+        statusChartInstance = new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: statusLabels,
+                datasets: [{ data: Object.values(statusCount), backgroundColor: statusColors, borderWidth: 2, borderColor: '#fff' }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+
+        const total = bookingsData.length || 1;
+        document.getElementById('status-legend').innerHTML = statusLabels.map((l, i) => {
+            const cnt = Object.values(statusCount)[i];
+            const pct = Math.round(cnt / total * 100);
+            return `<div class="flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2"><div class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:${statusColors[i]}"></div><span class="text-slate-600">${l}</span></div>
+                <span class="font-bold text-slate-900">${cnt} <span class="text-gray-400 font-normal">(${pct}%)</span></span>
+            </div>`;
+        }).join('');
+
+        // ── Top Vendor ─────────────────────────────────────────────────────
+        const serviceMap = {};
+        servicesData.forEach(s => serviceMap[s.id_service] = s);
+        const vendorMap = {};
+        vendorsData.forEach(v => vendorMap[v.id_vendor] = v);
+
+        const vendorStats = {};
+        bookingsData.forEach(b => {
+            const svc = serviceMap[b.id_service];
+            if (!svc) return;
+            const vid = svc.id_vendor;
+            if (!vendorStats[vid]) vendorStats[vid] = { count: 0, revenue: 0 };
+            vendorStats[vid].count++;
+            if (b.status_pembayaran === 'lunas') vendorStats[vid].revenue += Number(b.total_harga || 0);
+        });
+
+        const topVendors = Object.entries(vendorStats)
+            .sort((a, b) => b[1].count - a[1].count)
+            .slice(0, 10);
+
+        const tvBody = document.getElementById('top-vendor-body');
+        tvBody.innerHTML = topVendors.length === 0
+            ? `<tr><td colspan="6" class="py-8 text-center text-gray-400 text-xs">Belum ada data.</td></tr>`
+            : topVendors.map(([vid, stats], idx) => {
+                const v = vendorMap[vid] || { nama_usaha: `Vendor #${vid}`, jenis_jasa: '—', rating_avg: '—' };
+                return `<tr class="hover:bg-gray-50/60 transition">
+                    <td class="py-3.5 px-6 font-black text-slate-400">${idx + 1}</td>
+                    <td class="py-3.5 px-6 font-bold text-slate-900">${v.nama_usaha}</td>
+                    <td class="py-3.5 px-6 text-gray-500">${v.jenis_jasa || '—'}</td>
+                    <td class="py-3.5 px-6 font-bold text-slate-900">${stats.count}</td>
+                    <td class="py-3.5 px-6 font-bold text-orange-600">${formatRupiah(stats.revenue)}</td>
+                    <td class="py-3.5 px-6">
+                        ${v.rating_avg ? `<span class="text-amber-500">★</span> ${v.rating_avg}` : '<span class="text-gray-400">—</span>'}
+                    </td>
+                </tr>`;
+            }).join('');
+
+        // ── 10 Booking Terbaru ───────────────────────────────────────────
+        const STATUS_MAP = {
+            pending:   'bg-orange-50 text-orange-700',
+            confirmed: 'bg-emerald-50 text-emerald-700',
+            completed: 'bg-blue-50 text-blue-700',
+            rejected:  'bg-red-50 text-red-700'
+        };
+        const PAY_MAP = {
+            belum_bayar: 'bg-gray-100 text-gray-600',
+            dp:          'bg-blue-50 text-blue-700',
+            lunas:       'bg-emerald-50 text-emerald-700'
+        };
+        const STATUS_LABEL = { pending:'Pending', confirmed:'Dikonfirmasi', completed:'Selesai', rejected:'Ditolak' };
+        const PAY_LABEL    = { belum_bayar:'Belum Bayar', dp:'DP', lunas:'Lunas' };
+
+        const recent = [...bookingsData].slice(0, 10);
+        const rbody = document.getElementById('recent-booking-body');
+        rbody.innerHTML = recent.map(b => {
+            const tgl = b.tanggal_event ? new Date(b.tanggal_event).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }) : '—';
+            const sp  = b.status_pembayaran || 'belum_bayar';
+            return `<tr class="hover:bg-gray-50/60 transition">
+                <td class="py-3.5 px-5 font-bold text-slate-900">#${b.id_booking}</td>
+                <td class="py-3.5 px-5 text-gray-500">${tgl}</td>
+                <td class="py-3.5 px-5 text-gray-500">${b.lokasi || '—'}</td>
+                <td class="py-3.5 px-5 font-bold text-orange-600">Rp ${Number(b.total_harga || 0).toLocaleString('id-ID')}</td>
+                <td class="py-3.5 px-5"><span class="${STATUS_MAP[b.status] || 'bg-gray-100 text-gray-600'} text-[10px] font-bold px-2.5 py-1 rounded-full">${STATUS_LABEL[b.status] || b.status}</span></td>
+                <td class="py-3.5 px-5"><span class="${PAY_MAP[sp] || 'bg-gray-100 text-gray-600'} text-[10px] font-bold px-2.5 py-1 rounded-full">${PAY_LABEL[sp] || sp}</span></td>
+            </tr>`;
+        }).join('');
+
+    } catch (err) {
+        console.error(err);
+        showToast('Gagal memuat data laporan.', 'error');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', initLaporan);
+</script>
+</body>
+</html>

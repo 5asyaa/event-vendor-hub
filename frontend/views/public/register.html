@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buat Akun Baru - EventVendorHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-[#f8f9fc] min-h-screen flex">
+
+    <!-- Panel Kiri -->
+    <div class="hidden lg:flex lg:w-1/2 bg-[#1e293b] p-12 flex-col justify-between relative text-white">
+        <div class="absolute inset-0 opacity-30 bg-[url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=1000')] bg-cover bg-center"></div>
+        <div class="relative z-10 flex items-center gap-2 font-bold text-lg cursor-pointer" onclick="window.location.href='index.html'">
+            <i class="fa-solid fa-calendar-check text-orange-500"></i> EventVendorHub
+        </div>
+        <div class="relative z-10 space-y-4 max-w-sm">
+            <h1 class="text-4xl font-extrabold tracking-tight leading-tight">Mulai Rencanakan Eventmu</h1>
+            <p class="text-sm text-gray-300 leading-relaxed">Temukan vendor terbaik untuk mewujudkan momen tak terlupakan dengan standar hospitality premium Indonesia.</p>
+        </div>
+        <div class="relative z-10 text-[10px] text-gray-400 font-medium">
+            <i class="fa-regular fa-star mr-1"></i> Dipercaya oleh ribuan profesional event di seluruh Indonesia
+        </div>
+    </div>
+
+    <!-- Panel Kanan -->
+    <div class="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-white overflow-y-auto">
+        <div class="w-full max-w-md space-y-6 py-8">
+            <div>
+                <h2 class="text-2xl font-black text-slate-900 tracking-tight">Buat Akun Customer</h2>
+                <p class="text-xs text-gray-400 mt-1">Daftar untuk mencari dan memesan vendor event terbaik.</p>
+            </div>
+
+            <!-- Error Banner -->
+            <div id="error-banner" class="hidden items-center gap-2 bg-red-50 border border-red-200 text-red-600 text-xs font-semibold rounded-xl px-4 py-3">
+                <i class="fa-solid fa-circle-exclamation flex-shrink-0"></i>
+                <span id="error-text">Terjadi kesalahan.</span>
+            </div>
+
+            <form id="register-form" class="space-y-4">
+                <!-- Role sudah fixed ke customer -->
+                <input type="hidden" id="role-input" value="customer">
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Nama Lengkap</label>
+                    <input id="nama-input" type="text" required placeholder="Masukkan nama lengkap"
+                        class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-orange-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Email</label>
+                    <input id="email-input" type="email" required placeholder="nama@email.com"
+                        class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-orange-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Nomor Telepon</label>
+                    <input id="phone-input" type="text" placeholder="+62 812 3456 7890"
+                        class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-orange-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Password</label>
+                    <input id="password-input" type="password" required placeholder="Minimal 8 karakter"
+                        class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-orange-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Konfirmasi Password</label>
+                    <input id="confirm-input" type="password" required placeholder="Ulangi password"
+                        class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-orange-500">
+                </div>
+
+                <button id="submit-btn" type="submit"
+                    class="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl text-xs transition shadow-md">
+                    <span id="submit-label">Daftar Sekarang</span>
+                </button>
+            </form>
+
+            <p class="text-xs text-center text-gray-500 font-medium">
+                Sudah punya akun? <a href="login.html" class="text-slate-900 font-bold hover:underline">Masuk</a>
+            </p>
+            <p class="text-xs text-center text-gray-500 font-medium">
+                Ingin daftar sebagai vendor? <a href="daftar-vendor.html" class="text-orange-500 font-bold hover:underline">Daftar Vendor</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const API = 'http://localhost:3000';
+
+        function showError(msg) {
+            const b = document.getElementById('error-banner');
+            document.getElementById('error-text').textContent = msg;
+            b.classList.remove('hidden');
+            b.classList.add('flex');
+        }
+        function hideError() {
+            const b = document.getElementById('error-banner');
+            b.classList.add('hidden');
+            b.classList.remove('flex');
+        }
+
+        document.getElementById('register-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            hideError();
+
+            const role     = 'customer'; // register ini khusus customer
+            const nama     = document.getElementById('nama-input').value.trim();
+            const email    = document.getElementById('email-input').value.trim();
+            const password = document.getElementById('password-input').value;
+            const confirm  = document.getElementById('confirm-input').value;
+            const btn      = document.getElementById('submit-btn');
+            const label    = document.getElementById('submit-label');
+
+            if (!nama || !email || !password) {
+                showError('Nama, email, dan password wajib diisi.');
+                return;
+            }
+            if (password !== confirm) {
+                showError('Password dan konfirmasi password tidak cocok.');
+                return;
+            }
+            if (password.length < 6) {
+                showError('Password minimal 6 karakter.');
+                return;
+            }
+
+            btn.disabled = true;
+            label.textContent = 'Mendaftar...';
+
+            try {
+                const res = await fetch(API + '/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nama, email, password, role })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.message || 'Registrasi gagal. Email mungkin sudah digunakan.');
+                }
+
+                // Redirect ke login setelah berhasil
+                // Tampilkan info khusus untuk vendor
+                if (role === 'vendor') {
+                    // Simpan flag untuk tampilkan pesan di halaman login
+                    localStorage.setItem('register_vendor_pending', '1');
+                }
+                window.location.href = 'login.html';
+
+            } catch (err) {
+                showError(err.message);
+                btn.disabled = false;
+                label.textContent = 'Daftar Sekarang';
+            }
+        });
+    });
+    </script>
+</body>
+</html>

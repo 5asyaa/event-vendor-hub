@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Vendor - EventVendorHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-[#f9f9fb] text-slate-800 min-h-screen flex">
+
+<!-- SIDEBAR -->
+<aside class="w-64 bg-[#0a1120] text-gray-400 p-6 flex flex-col justify-between hidden md:flex min-h-screen sticky top-0">
+    <div class="space-y-8">
+        <div><span class="block font-bold text-lg text-white tracking-tight">EventVendorHub</span><span class="text-[10px] uppercase tracking-wider text-gray-500 block mt-0.5">Vendor Portal</span></div>
+        <nav class="space-y-1 text-sm font-medium">
+            <a href="vendor-dashboard.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-chart-pie"></i> Dasbor</a>
+            <a href="pesanan-masuk.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-regular fa-calendar-check"></i> Pemesanan</a>
+            <a href="manajemen-layanan.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-layer-group"></i> Layanan Saya</a>
+            <a href="analitik-vendor.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-chart-line"></i> Analisis</a>
+        </nav>
+    </div>
+    <div class="space-y-4">
+        <a href="profil-vendor.html" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition"><i class="fa-solid fa-user"></i> Profil Saya</a>
+        <a href="#" onclick="doLogout()" class="flex items-center gap-3 px-4 py-2 text-sm hover:text-red-400 hover:bg-slate-900/50 rounded-lg transition"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+    </div>
+</aside>
+
+<main class="flex-1 p-6 md:p-10 max-w-4xl mx-auto w-full space-y-6">
+
+    <div class="flex items-center gap-3 mb-2">
+        <a href="vendor-dashboard.html" class="text-gray-400 hover:text-slate-700 transition"><i class="fa-solid fa-arrow-left"></i></a>
+        <h1 class="text-2xl font-extrabold text-slate-900">Profil Vendor</h1>
+    </div>
+
+    <!-- Avatar & info singkat -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex items-center gap-5">
+        <div id="avatar-circle" class="w-16 h-16 rounded-2xl bg-orange-500 text-white font-black text-2xl flex items-center justify-center flex-shrink-0">?</div>
+        <div>
+            <h2 id="display-nama-usaha" class="text-xl font-bold text-slate-900">Memuat...</h2>
+            <p id="display-jenis-jasa" class="text-xs font-semibold text-orange-500 uppercase mt-0.5">—</p>
+            <p id="display-alamat" class="text-xs text-gray-400 mt-1 flex items-center gap-1"><i class="fa-solid fa-location-dot text-gray-300"></i> —</p>
+        </div>
+        <div class="ml-auto text-center">
+            <span class="text-2xl font-black text-slate-900" id="display-rating">—</span>
+            <span class="text-xs text-gray-400 block">/5 rating</span>
+        </div>
+    </div>
+
+    <!-- Info Akun Pribadi -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+        <h3 class="font-bold text-slate-900 flex items-center gap-2"><i class="fa-regular fa-user text-orange-500"></i> Informasi Akun</h3>
+
+        <div id="msg-banner" class="hidden items-center gap-2 rounded-xl px-4 py-3 text-xs font-semibold"></div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-xs font-bold text-gray-600 mb-1">Nama Lengkap</label>
+                <input id="field-nama" type="text" placeholder="Nama pemilik"
+                    class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-600 mb-1">Email</label>
+                <input id="field-email" type="email" disabled
+                    class="w-full bg-gray-100 border border-gray-200 rounded-xl py-2.5 px-3 text-sm text-gray-400 cursor-not-allowed">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-600 mb-1">No. HP / WhatsApp</label>
+                <input id="field-hp" type="text" placeholder="+62 812..."
+                    class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Bisnis Vendor -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+        <h3 class="font-bold text-slate-900 flex items-center gap-2"><i class="fa-solid fa-store text-orange-500"></i> Informasi Bisnis</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-xs font-bold text-gray-600 mb-1">Nama Usaha</label>
+                <input id="field-nama-usaha" type="text" placeholder="Nama usaha Anda"
+                    class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-600 mb-1">Kategori / Jenis Jasa</label>
+                <select id="field-jenis-jasa"
+                    class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    <option value="">Pilih kategori...</option>
+                    <option value="Fotografi">Fotografi</option>
+                    <option value="Videografi">Videografi</option>
+                    <option value="Catering">Catering</option>
+                    <option value="Dekorasi">Dekorasi</option>
+                    <option value="MC / Sound">MC / Sound</option>
+                    <option value="Wedding Organizer">Wedding Organizer</option>
+                    <option value="Venue">Venue</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Lainnya">Lainnya</option>
+                </select>
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-xs font-bold text-gray-600 mb-1">Alamat / Kota</label>
+                <input id="field-alamat" type="text" placeholder="Jakarta Selatan, DKI Jakarta"
+                    class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-xs font-bold text-gray-600 mb-1">Deskripsi Usaha</label>
+                <textarea id="field-deskripsi" rows="3" placeholder="Ceritakan tentang bisnis Anda..."
+                    class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ganti Password -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+        <h3 class="font-bold text-slate-900 flex items-center gap-2"><i class="fa-solid fa-lock text-orange-500"></i> Ganti Password</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-xs font-bold text-gray-600 mb-1">Password Baru</label>
+                <input id="field-newpass" type="password" placeholder="Minimal 6 karakter"
+                    class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-600 mb-1">Konfirmasi Password Baru</label>
+                <input id="field-confirmpass" type="password" placeholder="Ulangi password"
+                    class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+            </div>
+        </div>
+    </div>
+
+    <div class="flex gap-3">
+        <button id="save-btn" class="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl text-sm transition shadow-sm">
+            <span id="save-label">Simpan Perubahan</span>
+        </button>
+        <a href="vendor-dashboard.html" class="px-6 py-3 border border-slate-200 text-slate-600 font-semibold rounded-xl text-sm hover:bg-slate-50 transition text-center">
+            Kembali
+        </a>
+    </div>
+
+</main>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-6 right-6 z-50 hidden">
+    <div id="toast-inner" class="flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg text-sm font-semibold text-white">
+        <i id="toast-icon"></i><span id="toast-text"></span>
+    </div>
+</div>
+
+<script>
+const API = 'http://localhost:3000';
+let currentVendor = null;
+
+function doLogout() { localStorage.removeItem('session'); window.location.href = '../public/login.html'; }
+
+function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    document.getElementById('toast-inner').style.background = type === 'success' ? '#16a34a' : '#dc2626';
+    document.getElementById('toast-icon').className = type === 'success' ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-exclamation';
+    document.getElementById('toast-text').textContent = msg;
+    t.classList.remove('hidden');
+    setTimeout(() => t.classList.add('hidden'), 3000);
+}
+
+document.addEventListener('DOMContentLoaded', async function() {
+    const session = JSON.parse(localStorage.getItem('session') || '{}');
+    if (!session.isLoggedIn || session.role !== 'vendor') {
+        window.location.href = '../public/login.html'; return;
+    }
+
+    const token   = session.token || '';
+    const headers = { 'Authorization': `Bearer ${token}` };
+
+    try {
+        // Ambil data user
+        const userRes = await fetch(`${API}/auth/users/${session.id}`);
+        if (userRes.ok) {
+            const user = await userRes.json();
+            document.getElementById('field-nama').value  = user.nama  || '';
+            document.getElementById('field-email').value = user.email || '';
+            document.getElementById('field-hp').value    = user.no_hp || '';
+        }
+
+        // Ambil data vendor
+        const vendorsRes = await fetch(`${API}/vendors`, { headers });
+        const vendors    = await vendorsRes.json();
+        currentVendor    = vendors.find(v => Number(v.id_user) === Number(session.id));
+
+        if (currentVendor) {
+            const initials = (currentVendor.nama_usaha || '?').substring(0, 2).toUpperCase();
+            document.getElementById('avatar-circle').textContent      = initials;
+            document.getElementById('display-nama-usaha').textContent = currentVendor.nama_usaha || '—';
+            document.getElementById('display-jenis-jasa').textContent = currentVendor.jenis_jasa || 'Belum diisi';
+            document.getElementById('display-alamat').innerHTML       = `<i class="fa-solid fa-location-dot text-gray-300 mr-1"></i>${currentVendor.alamat || '—'}`;
+            document.getElementById('display-rating').textContent     = currentVendor.rating_avg || '—';
+
+            document.getElementById('field-nama-usaha').value = currentVendor.nama_usaha || '';
+            document.getElementById('field-alamat').value     = currentVendor.alamat     || '';
+            document.getElementById('field-deskripsi').value  = currentVendor.deskripsi  || '';
+
+            // Set jenis jasa select
+            const jenisSel = document.getElementById('field-jenis-jasa');
+            if (currentVendor.jenis_jasa) {
+                for (let opt of jenisSel.options) {
+                    if (opt.value === currentVendor.jenis_jasa) { opt.selected = true; break; }
+                }
+            }
+        } else {
+            document.getElementById('display-nama-usaha').textContent = session.nama || 'Vendor';
+        }
+
+    } catch(e) {
+        console.error(e);
+        showToast('Gagal memuat data profil.', 'error');
+    }
+
+    // Simpan perubahan
+    document.getElementById('save-btn').addEventListener('click', async function() {
+        const newpass   = document.getElementById('field-newpass').value;
+        const confpass  = document.getElementById('field-confirmpass').value;
+
+        if (newpass && newpass !== confpass) {
+            showToast('Password baru tidak cocok!', 'error');
+            return;
+        }
+        if (newpass && newpass.length < 6) {
+            showToast('Password minimal 6 karakter!', 'error');
+            return;
+        }
+
+        const label = document.getElementById('save-label');
+        label.textContent = 'Menyimpan...';
+        this.disabled = true;
+
+        let hasError = false;
+
+        // 1. Update data user (nama, no_hp, password) via auth-service
+        try {
+            const nama  = document.getElementById('field-nama').value.trim();
+            const no_hp = document.getElementById('field-hp').value.trim();
+            const body  = { nama, no_hp };
+            if (newpass) body.password = newpass;
+
+            const userRes = await fetch(`${API}/auth/users/${session.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+
+            if (!userRes.ok) {
+                const errData = await userRes.json().catch(() => ({}));
+                throw new Error(errData.message || 'Gagal update data user');
+            }
+
+            // Refresh dari backend dan update tampilan
+            const updated = await fetch(`${API}/auth/users/${session.id}`).then(r => r.json());
+            document.getElementById('field-nama').value = updated.nama  || '';
+            document.getElementById('field-hp').value   = updated.no_hp || '';
+
+            // Update session lokal
+            const updatedSession = { ...session, nama: updated.nama || nama };
+            localStorage.setItem('session', JSON.stringify(updatedSession));
+
+            // Reset password fields
+            document.getElementById('field-newpass').value    = '';
+            document.getElementById('field-confirmpass').value = '';
+        } catch(e) {
+            hasError = true;
+            console.error('Gagal update user:', e.message);
+        }
+
+        // 2. Update data vendor (nama_usaha, jenis_jasa, alamat, deskripsi)
+        if (currentVendor) {
+            try {
+                const namaUsaha  = document.getElementById('field-nama-usaha').value.trim();
+                const jenisJasa  = document.getElementById('field-jenis-jasa').value;
+                const alamat     = document.getElementById('field-alamat').value.trim();
+                const deskripsi  = document.getElementById('field-deskripsi').value.trim();
+                const no_hp      = document.getElementById('field-hp').value.trim();
+
+                const vendorRes = await fetch(`${API}/vendors/${currentVendor.id_vendor}/profile`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        nama_usaha:     namaUsaha  || undefined,
+                        jenis_jasa:     jenisJasa  || undefined,
+                        alamat:         alamat     || undefined,
+                        link_whatsapp:  no_hp      || undefined,
+                        deskripsi:  deskripsi  || undefined
+                    })
+                });
+
+                if (vendorRes.ok) {
+                    // Update tampilan header sesuai data terbaru
+                    if (namaUsaha) {
+                        document.getElementById('display-nama-usaha').textContent = namaUsaha;
+                        document.getElementById('avatar-circle').textContent = namaUsaha.substring(0, 2).toUpperCase();
+                        currentVendor.nama_usaha = namaUsaha;
+                    }
+                    if (jenisJasa) {
+                        document.getElementById('display-jenis-jasa').textContent = jenisJasa;
+                        currentVendor.jenis_jasa = jenisJasa;
+                    }
+                    if (alamat) {
+                        document.getElementById('display-alamat').innerHTML = `<i class="fa-solid fa-location-dot text-gray-300 mr-1"></i>${alamat}`;
+                        currentVendor.alamat = alamat;
+                    }
+                } else {
+                    hasError = true;
+                }
+            } catch(e) {
+                hasError = true;
+                console.error('Gagal update vendor:', e.message);
+            }
+        }
+
+        label.textContent = 'Simpan Perubahan';
+        this.disabled = false;
+
+        if (hasError) {
+            showToast('Sebagian data berhasil disimpan (ada yang gagal).', 'error');
+        } else {
+            showToast('Profil berhasil diperbarui!', 'success');
+        }
+    });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masuk ke Akun - EventVendorHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-[#f8f9fc] min-h-screen flex">
+
+    <!-- Panel Kiri -->
+    <div class="hidden lg:flex lg:w-1/2 bg-[#0f172a] p-12 flex-col justify-between relative overflow-hidden text-white">
+        <div class="absolute inset-0 opacity-40 bg-[url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=1000')] bg-cover bg-center"></div>
+        <div class="relative z-10 flex items-center gap-2 font-bold text-lg cursor-pointer" onclick="window.location.href='index.html'">
+            <i class="fa-solid fa-calendar-check text-orange-500"></i> EventVendorHub
+        </div>
+        <div class="relative z-10 space-y-4 max-w-md">
+            <h1 class="text-4xl font-extrabold tracking-tight leading-tight">Selamat Datang Kembali</h1>
+            <p class="text-sm text-gray-300 leading-relaxed">Kelola portofolio vendor Anda, temukan klien baru, dan ciptakan acara yang tak terlupakan dengan standar hospitality Indonesia yang terbaik.</p>
+        </div>
+        <div class="relative z-10 text-[11px] text-gray-400 font-medium border-t border-gray-800 pt-4">VENDOR PORTAL</div>
+    </div>
+
+    <!-- Panel Kanan -->
+    <div class="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-white">
+        <div class="w-full max-w-md space-y-6">
+            <div>
+                <h2 class="text-2xl font-black text-slate-900 tracking-tight">Masuk ke Akun</h2>
+                <p class="text-xs text-gray-400 mt-1">Silakan masukkan kredensial Anda untuk melanjutkan.</p>
+            </div>
+
+            <!-- Error Banner -->
+            <div id="error-banner" class="hidden items-center gap-2 bg-red-50 border border-red-200 text-red-600 text-xs font-semibold rounded-xl px-4 py-3">
+                <i class="fa-solid fa-circle-exclamation flex-shrink-0"></i>
+                <span id="error-text">Email atau kata sandi salah.</span>
+            </div>
+
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Alamat Email</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400"><i class="fa-regular fa-envelope text-xs"></i></span>
+                        <input id="email-input" type="email" required placeholder="nama@perusahaan.com"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-9 pr-4 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="text-xs font-bold text-gray-600">Kata Sandi</label>
+                        <a href="#" id="forgotPwLink" class="text-[11px] font-bold text-orange-500 hover:underline">Lupa Password?</a>
+                    </div>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400"><i class="fa-solid fa-lock text-xs"></i></span>
+                        <input id="password-input" type="password" required placeholder="••••••••"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-9 pr-10 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 cursor-pointer hover:text-slate-700 toggle-pw">
+                            <i class="fa-regular fa-eye-slash text-xs"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 py-1">
+                    <input type="checkbox" id="remember" class="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500">
+                    <label for="remember" class="text-xs font-medium text-gray-500 cursor-pointer select-none">Ingat saya di perangkat ini</label>
+                </div>
+
+                <button id="submit-btn" type="submit"
+                    class="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    <span id="submit-label">Masuk</span>
+                </button>
+            </form>
+
+            <div class="relative flex items-center justify-center py-2">
+                <div class="absolute w-full border-t border-gray-100"></div>
+                <span class="relative bg-white px-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Atau</span>
+            </div>
+
+            <div class="space-y-2 text-center">
+                <p class="text-xs text-gray-500 font-medium">
+                    Belum punya akun? <a href="register.html" class="text-slate-900 font-bold hover:underline">Daftar sebagai Customer</a>
+                </p>
+                <p class="text-xs text-gray-500 font-medium">
+                    Ingin bergabung sebagai vendor? <a href="daftar-vendor.html" class="text-orange-500 font-bold hover:underline">Daftar Vendor →</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Lupa Password -->
+    <div id="forgotPasswordModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div class="p-6 sm:p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-black text-slate-900 tracking-tight">Atur Ulang Kata Sandi</h3>
+                    <button type="button" id="closeModalBtn" class="text-gray-400 hover:text-gray-600 transition">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+                <form id="forgotPasswordForm" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Alamat Email</label>
+                        <input type="email" required placeholder="nama@perusahaan.com"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-3 pr-4 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Kata Sandi Baru</label>
+                        <input type="password" id="newPassword" required placeholder="Minimal 8 karakter"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-3 pr-4 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Konfirmasi Kata Sandi</label>
+                        <input type="password" id="confirmNewPassword" required placeholder="Ulangi kata sandi baru"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-3 pr-4 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    </div>
+                    <!-- Error di dalam modal -->
+                    <div id="modal-error" class="hidden bg-red-50 border border-red-100 text-red-600 text-xs font-semibold rounded-xl px-3 py-2">
+                        Kata sandi baru tidak cocok!
+                    </div>
+                    <div id="modal-success" class="hidden bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-semibold rounded-xl px-3 py-2">
+                        Kata sandi berhasil diubah! Silakan login.
+                    </div>
+                    <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl text-xs transition shadow-md mt-2">
+                        Simpan Kata Sandi Baru
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const API = 'http://localhost:3000';
+
+        // ── Toggle show/hide password ──────────────────────────────
+        document.querySelectorAll('.toggle-pw').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const input = this.previousElementSibling;
+                const icon  = this.querySelector('i');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.className = 'fa-regular fa-eye text-xs';
+                } else {
+                    input.type = 'password';
+                    icon.className = 'fa-regular fa-eye-slash text-xs';
+                }
+            });
+        });
+
+        // ── Tampilkan banner jika vendor baru saja daftar ─────────
+        if (localStorage.getItem('register_vendor_pending')) {
+            localStorage.removeItem('register_vendor_pending');
+            var infoBanner = document.createElement('div');
+            infoBanner.style.cssText = 'display:flex;align-items:flex-start;gap:8px;background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;border-radius:12px;padding:10px 14px;font-size:12px;font-weight:600;margin-bottom:12px;';
+            infoBanner.innerHTML = '<i class="fa-solid fa-circle-info" style="margin-top:2px;flex-shrink:0;"></i><span>Akun vendor berhasil dibuat. Profil Anda perlu diverifikasi admin sebelum tampil di platform. Silakan login untuk melanjutkan.</span>';
+            document.getElementById('login-form').insertAdjacentElement('beforebegin', infoBanner);
+        }
+
+        // ── Error banner helpers ───────────────────────────────────
+        function showError(msg) {
+            const banner = document.getElementById('error-banner');
+            document.getElementById('error-text').textContent = msg;
+            banner.classList.remove('hidden');
+            banner.classList.add('flex');
+        }
+        function hideError() {
+            const banner = document.getElementById('error-banner');
+            banner.classList.add('hidden');
+            banner.classList.remove('flex');
+        }
+
+        // Sembunyikan error saat user mengetik
+        document.getElementById('email-input').addEventListener('input', hideError);
+        document.getElementById('password-input').addEventListener('input', hideError);
+
+        // ── Login Form Submit ──────────────────────────────────────
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            hideError();
+
+            const email    = document.getElementById('email-input').value.trim();
+            const password = document.getElementById('password-input').value;
+            const btn      = document.getElementById('submit-btn');
+            const label    = document.getElementById('submit-label');
+
+            btn.disabled   = true;
+            label.textContent = 'Memproses...';
+
+            try {
+                const res = await fetch(API + '/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.message || 'Email atau kata sandi salah.');
+                }
+
+                const data = await res.json();
+
+                localStorage.setItem('session', JSON.stringify({
+                    token:      data.token,
+                    role:       data.user.role,
+                    nama:       data.user.nama,
+                    id:         data.user.id_user,
+                    isLoggedIn: true
+                }));
+
+                // Redirect sesuai role
+                if (data.user.role === 'admin') {
+                    window.location.href = '../admin/dashboard-admin.html';
+                } else if (data.user.role === 'vendor') {
+                    window.location.href = '../vendor/vendor-dashboard.html';
+                } else {
+                    window.location.href = '../customer/pencarian-vendor.html';
+                }
+
+            } catch (err) {
+                showError(err.message || 'Email atau kata sandi salah.');
+                btn.disabled = false;
+                label.textContent = 'Masuk';
+            }
+        });
+
+        // ── Modal Lupa Password ────────────────────────────────────
+        const modal     = document.getElementById('forgotPasswordModal');
+        const closeBtn  = document.getElementById('closeModalBtn');
+        const forgotLink = document.getElementById('forgotPwLink');
+
+        forgotLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            modal.classList.remove('hidden');
+        });
+        closeBtn.addEventListener('click', function() {
+            modal.classList.add('hidden');
+        });
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) modal.classList.add('hidden');
+        });
+
+        document.getElementById('forgotPasswordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const newPw  = document.getElementById('newPassword').value;
+            const confPw = document.getElementById('confirmNewPassword').value;
+            const errEl  = document.getElementById('modal-error');
+            const sucEl  = document.getElementById('modal-success');
+
+            errEl.classList.add('hidden');
+            sucEl.classList.add('hidden');
+
+            if (newPw !== confPw) {
+                errEl.classList.remove('hidden');
+                return;
+            }
+
+            sucEl.classList.remove('hidden');
+            setTimeout(function() {
+                modal.classList.add('hidden');
+                document.getElementById('forgotPasswordForm').reset();
+                sucEl.classList.add('hidden');
+            }, 2000);
+        });
+    });
+    </script>
+</body>
+</html>

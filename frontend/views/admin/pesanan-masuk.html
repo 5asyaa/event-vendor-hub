@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesanan Masuk - Admin Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-[#f8f9fc] text-slate-800 min-h-screen flex">
+
+<!-- SIDEBAR -->
+<aside class="w-64 bg-[#0a1120] text-gray-400 p-6 flex flex-col justify-between hidden md:flex min-h-screen sticky top-0">
+    <div class="space-y-8">
+        <div><span class="block font-bold text-lg text-white tracking-tight">EventVendorHub</span><span class="text-[10px] uppercase tracking-wider text-gray-500 block mt-0.5">Admin Portal</span></div>
+        <nav class="space-y-1 text-sm font-medium">
+            <a href="dashboard-admin.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+            <a href="verifikasi-vendor.html" class="flex items-center justify-between px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition">
+                <span class="flex items-center gap-3"><i class="fa-regular fa-id-card"></i> Verifikasi Vendor</span>
+                <span id="sidebar-vendor-count" class="bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">...</span>
+            </a>
+            <a href="kelola-user.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-users"></i> Kelola User</a>
+            <a href="pesanan-masuk.html" class="flex items-center gap-3 bg-orange-500 text-white px-4 py-3 rounded-xl shadow-md font-semibold"><i class="fa-solid fa-wallet"></i> Pesanan Masuk</a>
+            <a href="laporan-platform.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-chart-line"></i> Laporan</a>
+        </nav>
+    </div>
+    <div class="space-y-3">
+        <a href="profil-admin.html" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition"><i class="fa-solid fa-user"></i> Profil Saya</a>
+        <a href="#" onclick="doLogout()" class="flex items-center gap-3 px-4 py-2 text-sm hover:text-red-400 hover:bg-slate-900/50 rounded-lg transition"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+    </div>
+</aside>
+
+<main class="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full space-y-6">
+
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-900">Pesanan Masuk</h1>
+            <p class="text-xs text-gray-400 mt-0.5">Seluruh booking dari semua vendor di platform.</p>
+        </div>
+        <button onclick="loadBookings()" class="flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-orange-500 border border-slate-200 bg-white px-4 py-2 rounded-xl transition">
+            <i class="fa-solid fa-rotate-right"></i> Refresh
+        </button>
+    </div>
+
+    <!-- Stat mini -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white p-4 rounded-2xl border border-gray-100 text-center">
+            <span class="text-xs text-gray-400 block">Total</span>
+            <span id="count-all" class="text-xl font-black text-slate-900 block mt-1">—</span>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-orange-100 text-center">
+            <span class="text-xs text-gray-400 block">Pending</span>
+            <span id="count-pending" class="text-xl font-black text-orange-600 block mt-1">—</span>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-emerald-100 text-center">
+            <span class="text-xs text-gray-400 block">Dikonfirmasi</span>
+            <span id="count-confirmed" class="text-xl font-black text-emerald-600 block mt-1">—</span>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-gray-100 text-center">
+            <span class="text-xs text-gray-400 block">Ditolak</span>
+            <span id="count-rejected" class="text-xl font-black text-red-500 block mt-1">—</span>
+        </div>
+    </div>
+
+    <!-- Filter -->
+    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row gap-3 items-center">
+        <div class="relative w-full md:max-w-sm">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400"><i class="fa-solid fa-magnifying-glass text-xs"></i></span>
+            <input id="search-input" type="text" placeholder="Cari ID booking, lokasi, catatan..." oninput="filterAndRender()" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-9 pr-4 text-xs focus:outline-none focus:ring-1 focus:ring-orange-400">
+        </div>
+        <select id="filter-status" onchange="filterAndRender()" class="bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-xs focus:outline-none">
+            <option value="">Semua Status</option>
+            <option value="pending">Pending</option>
+            <option value="confirmed">Dikonfirmasi</option>
+            <option value="rejected">Ditolak</option>
+            <option value="completed">Selesai</option>
+        </select>
+        <select id="filter-payment" onchange="filterAndRender()" class="bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-xs focus:outline-none">
+            <option value="">Semua Pembayaran</option>
+            <option value="belum_bayar">Belum Bayar</option>
+            <option value="dp">DP</option>
+            <option value="lunas">Lunas</option>
+        </select>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100">
+                        <th class="py-3.5 px-5">ID Booking</th>
+                        <th class="py-3.5 px-5">Customer</th>
+                        <th class="py-3.5 px-5">Vendor / Layanan</th>
+                        <th class="py-3.5 px-5">Tanggal Event</th>
+                        <th class="py-3.5 px-5">Total</th>
+                        <th class="py-3.5 px-5">Status</th>
+                        <th class="py-3.5 px-5">Pembayaran</th>
+                    </tr>
+                </thead>
+                <tbody id="booking-table-body" class="divide-y divide-gray-100 text-gray-600 font-medium">
+                    <tr><td colspan="7" class="py-10 text-center text-gray-400">
+                        <div class="flex flex-col items-center gap-3">
+                            <div class="w-7 h-7 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                            <span class="text-xs">Memuat data booking...</span>
+                        </div>
+                    </td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="p-4 bg-gray-50/50 border-t border-gray-100 flex justify-between items-center text-xs text-gray-400">
+            <span id="pagination-info">—</span>
+            <div id="pagination-buttons" class="flex gap-1"></div>
+        </div>
+    </div>
+</main>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-6 right-6 z-50 hidden">
+    <div id="toast-inner" class="flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg text-sm font-semibold text-white">
+        <i id="toast-icon"></i><span id="toast-text"></span>
+    </div>
+</div>
+
+<script>
+const API = 'http://localhost:3000';
+const PAGE_SIZE = 20;
+let allBookings = [];
+let filteredBookings = [];
+let currentPage = 1;
+let userCache = {};
+let serviceCache = {};
+let vendorCache = {};
+
+function doLogout() { localStorage.removeItem('session'); window.location.href = '../public/login.html'; }
+
+function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    document.getElementById('toast-inner').style.background = type === 'success' ? '#16a34a' : '#dc2626';
+    document.getElementById('toast-icon').className = type === 'success' ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-exclamation';
+    document.getElementById('toast-text').textContent = msg;
+    t.classList.remove('hidden');
+    setTimeout(() => t.classList.add('hidden'), 3000);
+}
+
+const STATUS_MAP = {
+    pending:   { cls: 'bg-orange-50 text-orange-700 border border-orange-100',   label: 'Pending' },
+    confirmed: { cls: 'bg-emerald-50 text-emerald-700 border border-emerald-100', label: 'Dikonfirmasi' },
+    rejected:  { cls: 'bg-red-50 text-red-700 border border-red-100',             label: 'Ditolak' },
+    completed: { cls: 'bg-blue-50 text-blue-700 border border-blue-100',           label: 'Selesai' }
+};
+const PAY_MAP = {
+    belum_bayar: { cls: 'bg-gray-100 text-gray-600',               label: 'Belum Bayar' },
+    dp:          { cls: 'bg-blue-50 text-blue-700',                label: 'DP' },
+    lunas:       { cls: 'bg-emerald-50 text-emerald-700',          label: 'Lunas' }
+};
+
+function filterAndRender() {
+    const q    = (document.getElementById('search-input').value || '').toLowerCase();
+    const st   = document.getElementById('filter-status').value;
+    const pay  = document.getElementById('filter-payment').value;
+    filteredBookings = allBookings.filter(b => {
+        const matchQ  = !q || String(b.id_booking).includes(q) || (b.lokasi || '').toLowerCase().includes(q) || (b.catatan || '').toLowerCase().includes(q);
+        const matchSt = !st  || b.status === st;
+        const matchPay= !pay || (b.status_pembayaran || 'belum_bayar') === pay;
+        return matchQ && matchSt && matchPay;
+    });
+    currentPage = 1;
+    renderPage();
+}
+
+function renderPage() {
+    const tbody = document.getElementById('booking-table-body');
+    const total = filteredBookings.length;
+    const pages = Math.ceil(total / PAGE_SIZE);
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const slice = filteredBookings.slice(start, start + PAGE_SIZE);
+
+    document.getElementById('pagination-info').textContent =
+        total > 0 ? `Menampilkan ${start + 1}–${Math.min(start + PAGE_SIZE, total)} dari ${total}` : '0 booking';
+
+    if (slice.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-10 text-center text-gray-400 text-xs">Tidak ada booking ditemukan.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = slice.map(b => {
+        const customer     = userCache[b.id_user] || { nama: `User #${b.id_user}` };
+        const service      = serviceCache[b.id_service] || { nama_paket: `Layanan #${b.id_service}`, id_vendor: null };
+        const vendor       = service.id_vendor ? (vendorCache[service.id_vendor] || { nama_usaha: `Vendor #${service.id_vendor}` }) : { nama_usaha: '—' };
+        const stInfo       = STATUS_MAP[b.status] || { cls: 'bg-gray-100 text-gray-600', label: b.status };
+        const spKey        = b.status_pembayaran || 'belum_bayar';
+        const payInfo      = PAY_MAP[spKey] || { cls: 'bg-gray-100 text-gray-600', label: spKey };
+        const tgl          = b.tanggal_event ? new Date(b.tanggal_event).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }) : '—';
+        const total_harga  = Number(b.total_harga || 0).toLocaleString('id-ID');
+
+        return `
+            <tr class="hover:bg-gray-50/60 transition">
+                <td class="py-3.5 px-5 font-bold text-slate-900">#${b.id_booking}</td>
+                <td class="py-3.5 px-5">
+                    <span class="block font-semibold text-slate-900">${customer.nama || '—'}</span>
+                    <span class="text-[10px] text-gray-400">${b.no_telepon || '—'}</span>
+                </td>
+                <td class="py-3.5 px-5">
+                    <span class="block font-semibold text-slate-900">${vendor.nama_usaha}</span>
+                    <span class="text-[10px] text-gray-400">${service.nama_paket}</span>
+                </td>
+                <td class="py-3.5 px-5 text-gray-500">${tgl}</td>
+                <td class="py-3.5 px-5 font-bold text-orange-600">Rp ${total_harga}</td>
+                <td class="py-3.5 px-5"><span class="${stInfo.cls} text-[10px] font-bold px-2.5 py-1 rounded-full">${stInfo.label}</span></td>
+                <td class="py-3.5 px-5"><span class="${payInfo.cls} text-[10px] font-bold px-2.5 py-1 rounded-full">${payInfo.label}</span></td>
+            </tr>`;
+    }).join('');
+
+    // Pagination
+    const pEl = document.getElementById('pagination-buttons');
+    if (pages <= 1) { pEl.innerHTML = ''; return; }
+    let btns = '';
+    for (let i = 1; i <= Math.min(pages, 10); i++) {
+        btns += `<button onclick="goPage(${i})" class="w-7 h-7 rounded text-[11px] font-bold ${i === currentPage ? 'bg-[#0a1120] text-white' : 'bg-white border border-gray-200 text-slate-600 hover:bg-gray-50'}">${i}</button>`;
+    }
+    pEl.innerHTML = btns;
+}
+
+function goPage(p) { currentPage = p; renderPage(); }
+
+async function loadBookings() {
+    document.getElementById('booking-table-body').innerHTML = `<tr><td colspan="7" class="py-10 text-center text-gray-400"><div class="flex flex-col items-center gap-3"><div class="w-7 h-7 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div><span class="text-xs">Memuat data booking...</span></div></td></tr>`;
+    try {
+        const session = JSON.parse(localStorage.getItem('session') || '{}');
+        if (!session.isLoggedIn || session.role !== 'admin') { window.location.href = '../public/login.html'; return; }
+
+        const token   = session.token || '';
+        const headers = { 'Authorization': `Bearer ${token}` };
+
+        const [bRes, sRes, vRes] = await Promise.all([
+            fetch(`${API}/bookings`, { headers }),
+            fetch(`${API}/services`, { headers }),
+            fetch(`${API}/vendors`,  { headers })
+        ]);
+
+        if (bRes.status === 401) { localStorage.removeItem('session'); window.location.href = '../public/login.html'; return; }
+
+        const [bookings, services, vendors] = await Promise.all([
+            bRes.ok ? bRes.json() : [],
+            sRes.ok ? sRes.json() : [],
+            vRes.ok ? vRes.json() : []
+        ]);
+
+        document.getElementById('sidebar-vendor-count').textContent = vendors.length;
+
+        // Build caches
+        services.forEach(s => serviceCache[s.id_service] = s);
+        vendors.forEach(v => vendorCache[v.id_vendor] = v);
+
+        // Sort terbaru dulu
+        allBookings = [...bookings].sort((a, b) => b.id_booking - a.id_booking);
+        filteredBookings = [...allBookings];
+
+        // Stat counts
+        document.getElementById('count-all').textContent      = allBookings.length;
+        document.getElementById('count-pending').textContent   = allBookings.filter(b => b.status === 'pending').length;
+        document.getElementById('count-confirmed').textContent = allBookings.filter(b => b.status === 'confirmed').length;
+        document.getElementById('count-rejected').textContent  = allBookings.filter(b => b.status === 'rejected').length;
+
+        // Fetch semua user unik
+        const userIds = [...new Set(allBookings.map(b => b.id_user))];
+        await Promise.all(userIds.map(id =>
+            fetch(`${API}/auth/users/${id}`)
+                .then(r => r.ok ? r.json() : null)
+                .then(data => { if (data) userCache[id] = data; })
+                .catch(() => {})
+        ));
+
+        renderPage();
+    } catch (err) {
+        console.error(err);
+        showToast('Gagal memuat data booking.', 'error');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', loadBookings);
+</script>
+</body>
+</html>

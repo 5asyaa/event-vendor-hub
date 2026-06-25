@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifikasi Vendor - EventVendorHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .btn-press { transition: all 0.15s ease-in-out; }
+        .btn-press:active { transform: scale(0.96); }
+    </style>
+</head>
+<body class="bg-[#f8f9fc] text-slate-800 min-h-screen flex">
+
+<!-- SIDEBAR -->
+<aside class="w-64 bg-[#0a1120] text-gray-400 p-6 flex flex-col justify-between hidden md:flex min-h-screen sticky top-0">
+    <div class="space-y-8">
+        <div><span class="block font-bold text-lg text-white tracking-tight">EventVendorHub</span><span class="text-[10px] uppercase tracking-wider text-gray-500 block mt-0.5">Admin Portal</span></div>
+        <nav class="space-y-1 text-sm font-medium">
+            <a href="dashboard-admin.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+            <a href="verifikasi-vendor.html" class="flex items-center justify-between bg-orange-500 text-white px-4 py-3 rounded-xl shadow-md font-semibold">
+                <span class="flex items-center gap-3"><i class="fa-regular fa-id-card"></i> Verifikasi Vendor</span>
+                <span id="sidebar-vendor-count" class="bg-white text-orange-500 text-[10px] font-bold px-2 py-0.5 rounded-full">...</span>
+            </a>
+            <a href="kelola-user.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-users"></i> Kelola User</a>
+            <a href="pesanan-masuk.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-wallet"></i> Pesanan Masuk</a>
+            <a href="laporan-platform.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-chart-line"></i> Laporan</a>
+        </nav>
+    </div>
+    <div class="space-y-3">
+        <a href="profil-admin.html" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition"><i class="fa-solid fa-user"></i> Profil Saya</a>
+        <a href="#" onclick="doLogout()" class="flex items-center gap-3 px-4 py-2 text-sm hover:text-red-400 hover:bg-slate-900/50 rounded-lg transition"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+    </div>
+</aside>
+
+<div class="flex-1 w-full overflow-hidden">
+    <!-- Page Header -->
+    <header class="bg-white border-b border-gray-100 py-5 px-8 sticky top-0 z-10 flex items-center gap-4">
+        <a href="dashboard-admin.html" class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500 hover:text-slate-900 transition">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <div>
+            <h1 class="text-lg font-bold text-slate-900">Verifikasi Vendor</h1>
+            <p class="text-xs text-gray-500 mt-0.5">Data vendor yang terdaftar di platform</p>
+        </div>
+        <button onclick="loadVendors()" class="ml-auto flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-orange-500 border border-slate-200 bg-white px-4 py-2 rounded-xl transition">
+            <i class="fa-solid fa-rotate-right"></i> Refresh
+        </button>
+    </header>
+
+    <main class="max-w-6xl mx-auto p-6 md:p-8 space-y-6">
+
+        <!-- Stat Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-10 h-10 bg-orange-50 text-orange-500 rounded-xl flex items-center justify-center"><i class="fa-solid fa-store text-lg"></i></div>
+                </div>
+                <h3 class="text-sm font-medium text-gray-500 mb-1">Total Vendor Terdaftar</h3>
+                <span id="stat-total" class="text-3xl font-black text-slate-900">—</span>
+            </div>
+            <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-10 h-10 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center"><i class="fa-solid fa-star text-lg"></i></div>
+                </div>
+                <h3 class="text-sm font-medium text-gray-500 mb-1">Rata-rata Rating</h3>
+                <span id="stat-rating" class="text-3xl font-black text-slate-900">—</span>
+            </div>
+            <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-10 h-10 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center"><i class="fa-solid fa-layer-group text-lg"></i></div>
+                </div>
+                <h3 class="text-sm font-medium text-gray-500 mb-1">Total Layanan</h3>
+                <span id="stat-services" class="text-3xl font-black text-slate-900">—</span>
+            </div>
+        </div>
+
+        <!-- Search -->
+        <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex gap-3">
+            <div class="relative flex-1">
+                <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400"><i class="fa-solid fa-magnifying-glass text-sm"></i></span>
+                <input id="search-input" type="text" placeholder="Cari nama vendor atau kategori..." oninput="filterVendors()" class="w-full bg-slate-50 border border-gray-200 rounded-lg py-2.5 pl-11 pr-4 text-sm focus:outline-none focus:border-orange-500 transition">
+            </div>
+            <select id="filter-category" onchange="filterVendors()" class="bg-slate-50 border border-gray-200 rounded-lg py-2.5 px-3 text-sm focus:outline-none">
+                <option value="">Semua Kategori</option>
+            </select>
+            <select id="filter-status" onchange="filterVendors()" class="bg-slate-50 border border-gray-200 rounded-lg py-2.5 px-3 text-sm focus:outline-none">
+                <option value="">Semua Status</option>
+                <option value="pending">Menunggu Verifikasi</option>
+                <option value="approved">Terverifikasi</option>
+                <option value="rejected">Ditolak</option>
+            </select>
+        </div>
+
+        <!-- Vendor List -->
+        <div id="vendor-list" class="space-y-4">
+            <div class="flex justify-center py-12">
+                <div class="flex flex-col items-center gap-3 text-slate-400">
+                    <div class="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                    <span class="text-xs font-medium">Memuat vendor...</span>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-6 right-6 z-50 hidden">
+    <div id="toast-inner" class="flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg text-sm font-semibold text-white">
+        <i id="toast-icon"></i><span id="toast-text"></span>
+    </div>
+</div>
+
+<script>
+const API = 'http://localhost:3000';
+let allVendors = [];
+let allServices = [];
+
+function doLogout() { localStorage.removeItem('session'); window.location.href = '../public/login.html'; }
+
+function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    document.getElementById('toast-inner').style.background = type === 'success' ? '#16a34a' : '#dc2626';
+    document.getElementById('toast-icon').className = type === 'success' ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-exclamation';
+    document.getElementById('toast-text').textContent = msg;
+    t.classList.remove('hidden');
+    setTimeout(() => t.classList.add('hidden'), 3000);
+}
+
+function filterVendors() {
+    const q = document.getElementById('search-input').value.toLowerCase();
+    const cat = document.getElementById('filter-category').value;
+    const statusSel = document.getElementById('filter-status');
+    const statusFilter = statusSel ? statusSel.value : '';
+
+    const filtered = allVendors.filter(v => {
+        const matchQ = !q || (v.nama_usaha || '').toLowerCase().includes(q) || (v.jenis_jasa || '').toLowerCase().includes(q) || (v.alamat || '').toLowerCase().includes(q);
+        const matchCat = !cat || v.jenis_jasa === cat;
+        const matchStatus = !statusFilter || (v.status_verifikasi || 'pending') === statusFilter;
+        return matchQ && matchCat && matchStatus;
+    });
+    renderVendors(filtered);
+}
+
+function renderVendors(vendors) {
+    const list = document.getElementById('vendor-list');
+    if (vendors.length === 0) {
+        list.innerHTML = `<div class="flex flex-col items-center justify-center py-16 text-slate-400"><i class="fa-regular fa-folder-open text-4xl mb-3 text-slate-300"></i><p class="text-sm">Tidak ada vendor ditemukan.</p></div>`;
+        return;
+    }
+    list.innerHTML = vendors.map(v => {
+        const svcCount = allServices.filter(s => Number(s.id_vendor) === Number(v.id_vendor)).length;
+        const initials = (v.nama_usaha || '?').substring(0, 2).toUpperCase();
+        const rating   = v.rating_avg ? `⭐ ${v.rating_avg}` : 'Belum ada rating';
+        const status   = v.status_verifikasi || 'pending';
+
+        const statusBadge = {
+            approved: `<span class="bg-emerald-50 text-emerald-700 border border-emerald-100 text-[10px] font-bold px-2.5 py-1 rounded-full">✓ Terverifikasi</span>`,
+            pending:  `<span class="bg-orange-50 text-orange-700 border border-orange-100 text-[10px] font-bold px-2.5 py-1 rounded-full">⏳ Menunggu</span>`,
+            rejected: `<span class="bg-red-50 text-red-700 border border-red-100 text-[10px] font-bold px-2.5 py-1 rounded-full">✗ Ditolak</span>`
+        }[status] || '';
+
+        // Tombol aksi: hanya vendor pending yang butuh tombol Terima/Tolak
+        let actionBtns = '';
+        if (status === 'pending') {
+            actionBtns += `<button onclick="updateStatus(${v.id_vendor}, 'approved', this)" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs py-2.5 rounded-lg transition btn-press flex justify-center items-center gap-1.5"><i class="fa-solid fa-check"></i> Verifikasi</button>`;
+            actionBtns += `<button onclick="updateStatus(${v.id_vendor}, 'rejected', this)" class="flex-1 bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 font-semibold text-xs py-2.5 rounded-lg transition btn-press flex justify-center items-center gap-1.5"><i class="fa-solid fa-xmark"></i> Tolak</button>`;
+        }
+
+        return `
+            <div id="vendor-card-${v.id_vendor}" class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm hover:border-orange-300 transition flex flex-col lg:flex-row gap-5 items-start lg:items-center">
+                <div class="flex gap-4 flex-1 w-full">
+                    <div class="w-16 h-16 rounded-xl bg-slate-800 text-white font-bold text-lg flex items-center justify-center flex-shrink-0">${initials}</div>
+                    <div class="space-y-1 flex-1">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <h2 class="text-base font-bold text-slate-900">${v.nama_usaha || '—'}</h2>
+                            ${v.jenis_jasa ? `<span class="bg-gray-100 text-gray-500 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase">${v.jenis_jasa}</span>` : ''}
+                            ${statusBadge}
+                        </div>
+                        <div class="flex flex-wrap items-center gap-4 text-xs text-slate-600 font-medium">
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-gray-400"></i> ${v.alamat || '—'}</span>
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-layer-group text-gray-400"></i> ${svcCount} layanan</span>
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-star text-amber-400"></i> ${rating}</span>
+                        </div>
+                        ${v.deskripsi ? `<p class="text-xs text-gray-400 line-clamp-2 mt-1">${v.deskripsi}</p>` : ''}
+                    </div>
+                </div>
+                ${actionBtns ? `
+                <div class="w-full lg:w-48 flex gap-2 border-t lg:border-t-0 lg:border-l border-gray-100 pt-4 lg:pt-0 lg:pl-5">
+                    ${actionBtns}
+                </div>` : `
+                <div class="w-full lg:w-48 flex justify-center border-t lg:border-t-0 lg:border-l border-gray-100 pt-4 lg:pt-0 lg:pl-5">
+                    <span class="text-xs text-gray-400 italic">Tidak ada aksi tersedia</span>
+                </div>`}
+            </div>`;
+    }).join('');
+}
+
+async function updateStatus(id_vendor, status, btn) {
+    const session = JSON.parse(localStorage.getItem('session') || '{}');
+    const token   = session.token || '';
+    const label   = status === 'approved' ? 'Terverifikasi' : 'Ditolak';
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+    try {
+        const res = await fetch(`${API}/vendors/${id_vendor}/status`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ status_verifikasi: status })
+        });
+
+        if (!res.ok) throw new Error('Gagal update status');
+
+        showToast(`Vendor berhasil di-${label.toLowerCase()}!`, status === 'approved' ? 'success' : 'error');
+
+        // Reload data setelah update
+        setTimeout(loadVendors, 800);
+
+    } catch (err) {
+        showToast(err.message, 'error');
+        btn.disabled = false;
+        btn.innerHTML = status === 'approved' ? '<i class="fa-solid fa-check"></i> Verifikasi' : '<i class="fa-solid fa-xmark"></i> Tolak';
+    }
+}
+
+async function loadVendors() {
+    document.getElementById('vendor-list').innerHTML = `<div class="flex justify-center py-12"><div class="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div></div>`;
+    try {
+        const session = JSON.parse(localStorage.getItem('session') || '{}');
+        if (!session.isLoggedIn || session.role !== 'admin') { window.location.href = '../public/login.html'; return; }
+
+        const token   = session.token || '';
+        const headers = { 'Authorization': `Bearer ${token}` };
+
+        const [vRes, sRes] = await Promise.all([
+            fetch(`${API}/vendors`, { headers }),
+            fetch(`${API}/services`, { headers })
+        ]);
+
+        if (vRes.status === 401) { localStorage.removeItem('session'); window.location.href = '../public/login.html'; return; }
+
+        [allVendors, allServices] = await Promise.all([
+            vRes.ok ? vRes.json() : [],
+            sRes.ok ? sRes.json() : []
+        ]);
+
+        // Pastikan allVendors adalah array
+        if (!Array.isArray(allVendors)) allVendors = [];
+        if (!Array.isArray(allServices)) allServices = [];
+
+        // Hitung vendor pending untuk badge
+        const pendingCount = allVendors.filter(v => (v.status_verifikasi || 'pending') === 'pending').length;
+        document.getElementById('sidebar-vendor-count').textContent = pendingCount || allVendors.length;
+        document.getElementById('stat-total').textContent = allVendors.length;
+        document.getElementById('stat-services').textContent = allServices.length;
+
+        const rated = allVendors.filter(v => Number(v.rating_avg) > 0);
+        const avgRating = rated.length > 0
+            ? (rated.reduce((s, v) => s + Number(v.rating_avg), 0) / rated.length).toFixed(1)
+            : '—';
+        document.getElementById('stat-rating').textContent = avgRating;
+
+        // Isi filter kategori (reset dulu agar tidak duplikat saat refresh)
+        const sel = document.getElementById('filter-category');
+        sel.innerHTML = '<option value="">Semua Kategori</option>';
+        const categories = [...new Set(allVendors.map(v => v.jenis_jasa).filter(Boolean))];
+        categories.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; sel.appendChild(o); });
+
+        renderVendors(allVendors);
+    } catch (err) {
+        console.error(err);
+        showToast('Gagal memuat data vendor.', 'error');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', loadVendors);
+</script>
+</body>
+</html>

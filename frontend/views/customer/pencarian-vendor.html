@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cari Vendor - EventVendorHub</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            orange: '#F27024',
+                            orangeHover: '#D95D1A',
+                            darkBlue: '#0F172A',
+                            lightBg: '#F8FAFC',
+                            cardBlue: '#1E293B',
+                            primaryText: '#1E293B',
+                            lightBorder: '#E2E8F0',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        .btn-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.1);
+        }
+        /* Custom Checkbox */
+        input[type="checkbox"]:checked {
+            background-color: #0F172A;
+            border-color: #0F172A;
+        }
+    </style>
+</head>
+<body class="bg-[#F9FAFB] text-brand-primaryText font-sans min-h-screen flex flex-col">
+
+    <!-- NAVBAR STANDAR -->
+    <header class="bg-white border-b border-slate-100 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="../public/index.html" class="flex items-center gap-2 group">
+                <div class="bg-[#F27024] p-2 rounded-xl text-white group-hover:scale-105 transition-transform">
+                    <i class="fa-regular fa-calendar-days text-lg text-white"></i>
+                </div>
+                <span class="text-lg font-bold text-[#0F172A]">EventVendor<span class="text-[#F27024]">Hub</span></span>
+            </a>
+            <nav class="hidden md:flex items-center gap-6 text-sm font-semibold">
+                <a href="pencarian-vendor.html" class="text-[#F27024] relative after:content-[''] after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[2px] after:bg-[#F27024]">Temukan Vendor</a>
+                <a href="pesanan-saya.html" class="text-slate-500 hover:text-[#0F172A] transition">Pesanan Saya</a>
+            </nav>
+            <div id="auth-container" class="flex items-center gap-3">
+                <a href="../public/login.html" class="text-sm font-semibold text-slate-600 hover:text-[#0F172A] transition">Login</a>
+                <a href="../public/register.html" class="text-sm font-semibold text-white bg-[#0F172A] px-4 py-2 rounded-lg hover:bg-slate-800 shadow-sm transition">Register</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="max-w-7xl mx-auto px-6 py-8 flex-grow w-full flex flex-col md:flex-row gap-8">
+        
+        <!-- LEFT SIDEBAR: FILTER PENCARIAN -->
+        <aside class="w-full md:w-72 flex-shrink-0">
+            <div class="bg-white rounded-2xl border border-brand-lightBorder p-6 sticky top-28">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-lg font-bold text-slate-900">Filter Pencarian</h2>
+                    <i class="fa-solid fa-sliders text-slate-400"></i>
+                </div>
+
+                <!-- Lokasi -->
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Lokasi</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
+                        <input type="text" id="filter-lokasi" class="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg pl-9 pr-3 py-2.5 text-sm text-slate-700 focus:outline-none focus:border-brand-orange focus:bg-white" placeholder="Pilih kota...">
+                    </div>
+                </div>
+
+                <!-- Jenis Vendor -->
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-slate-700 mb-3">Jenis Vendor</label>
+                    <div class="space-y-3">
+                        <label class="flex items-center space-x-3 cursor-pointer">
+                            <input type="checkbox" value="foto" class="filter-kategori w-5 h-5 rounded border-slate-300 text-brand-darkBlue focus:ring-brand-darkBlue">
+                            <span class="text-sm text-slate-600 font-medium">Fotografer</span>
+                        </label>
+                        <label class="flex items-center space-x-3 cursor-pointer">
+                            <input type="checkbox" value="video" class="filter-kategori w-5 h-5 rounded border-slate-300 text-brand-darkBlue focus:ring-brand-darkBlue">
+                            <span class="text-sm text-slate-600 font-medium">Videografer</span>
+                        </label>
+                        <label class="flex items-center space-x-3 cursor-pointer">
+                            <input type="checkbox" value="dekor" class="filter-kategori w-5 h-5 rounded border-slate-300 text-brand-darkBlue focus:ring-brand-darkBlue">
+                            <span class="text-sm text-slate-600 font-medium">Dekorasi</span>
+                        </label>
+                        <label class="flex items-center space-x-3 cursor-pointer">
+                            <input type="checkbox" value="kater" class="filter-kategori w-5 h-5 rounded border-slate-300 text-brand-darkBlue focus:ring-brand-darkBlue">
+                            <span class="text-sm text-slate-600 font-medium">Katering</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Budget Range -->
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Budget Range (Rp)</label>
+                    <div class="flex items-center space-x-2">
+                        <input type="number" id="filter-budget-min" class="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-700 focus:outline-none focus:border-brand-orange focus:bg-white" placeholder="Min">
+                        <span class="text-slate-400">-</span>
+                        <input type="number" id="filter-budget-max" class="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-700 focus:outline-none focus:border-brand-orange focus:bg-white" placeholder="Max">
+                    </div>
+                </div>
+
+                <!-- Minimum Rating -->
+                <div class="mb-8">
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Minimum Rating</label>
+                    <div class="flex items-center space-x-1 text-lg" id="rating-stars">
+                        <i class="fa-regular fa-star text-slate-300 cursor-pointer hover:scale-110 transition-transform" data-val="1"></i>
+                        <i class="fa-regular fa-star text-slate-300 cursor-pointer hover:scale-110 transition-transform" data-val="2"></i>
+                        <i class="fa-regular fa-star text-slate-300 cursor-pointer hover:scale-110 transition-transform" data-val="3"></i>
+                        <i class="fa-regular fa-star text-slate-300 cursor-pointer hover:scale-110 transition-transform" data-val="4"></i>
+                        <i class="fa-regular fa-star text-slate-300 cursor-pointer hover:scale-110 transition-transform" data-val="5"></i>
+                        <span id="rating-label" class="text-sm font-semibold text-slate-400 ml-2">Semua</span>
+                    </div>
+                    <input type="hidden" id="filter-rating" value="0">
+                </div>
+
+                <!-- Buttons -->
+                <div class="space-y-3">
+                    <button id="btn-terapkan" class="w-full bg-brand-orange hover:bg-brand-orangeHover text-white font-semibold py-3 px-4 rounded-lg btn-transition">
+                        Terapkan Filter
+                    </button>
+                    <button id="btn-reset" class="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold py-3 px-4 rounded-lg btn-transition">
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- RIGHT CONTENT: SEARCH BAR & RESULTS -->
+        <div class="flex-1">
+            <!-- Search & Sort Header -->
+            <div class="bg-white border border-brand-lightBorder rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+                <!-- Search Bar Container -->
+                <div class="relative max-w-xl w-full flex gap-2">
+                    <div class="relative flex-1">
+                        <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </div>
+                        <input type="text" id="search-input" class="w-full bg-white border border-slate-200 rounded-full pl-11 pr-4 py-3 text-sm text-slate-700 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange shadow-sm transition-all" placeholder="Cari nama vendor atau kata kunci...">
+                    </div>
+                    <button id="btn-search" class="bg-brand-orange hover:bg-brand-orangeHover text-white font-semibold px-5 py-2.5 rounded-full text-sm btn-transition flex-shrink-0">
+                        Cari
+                    </button>
+                </div>
+                
+                <div class="flex items-center space-x-3 w-full md:w-auto justify-end">
+                    <span class="text-sm font-medium text-slate-500">Urutkan:</span>
+                    <select id="sort-select" class="bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-700 focus:outline-none cursor-pointer">
+                        <option value="relevansi">Relevansi</option>
+                        <option value="harga-asc">Harga Terendah</option>
+                        <option value="harga-desc">Harga Tertinggi</option>
+                        <option value="rating-desc">Rating Tertinggi</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Meta Info -->
+            <p id="meta-info" class="text-sm text-slate-500 mb-6 font-medium mt-4">Memuat vendor...</p>
+
+            <!-- GRID VENDOR CARDS -->
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-6" id="vendor-grid">
+
+            </div>
+
+            <!-- Pagination -->
+            <div id="pagination-controls" class="mt-10 flex justify-center items-center space-x-2 hidden"></div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-[#0B1221] text-white py-12 px-6 border-t border-slate-800 mt-auto">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="space-y-2 text-center md:text-left">
+                <a href="../index.html" class="flex items-center justify-center md:justify-start space-x-2">
+                    <div class="bg-brand-orange p-1.5 rounded-lg text-white">
+                        <i class="fa-regular fa-calendar-days text-sm text-white"></i>
+                    </div>
+                    <span class="text-lg font-bold tracking-tight text-white">EventVendor<span class="text-brand-orange">Hub</span></span>
+                </a>
+                <p class="text-sm text-slate-400">© 2024 EventVendorHub. Indonesian Hospitality, Global Standards.</p>
+            </div>
+            <div class="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-300">
+                <a href="#" class="hover:text-brand-orange transition-colors">About Us</a>
+                <a href="#" class="hover:text-brand-orange transition-colors">Terms of Service</a>
+                <a href="#" class="hover:text-brand-orange transition-colors">Privacy Policy</a>
+                <a href="#" class="hover:text-brand-orange transition-colors">Contact Support</a>
+                <a href="#" class="hover:text-brand-orange transition-colors">Vendor FAQ</a>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // ── State ─────────────────────────────────────────
+        const PAGE_SIZE  = 9;
+        let allVendors   = [];
+        let allServices  = [];
+        let filteredList = [];
+        let currentPage  = 1;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Auth UI
+            const authContainer = document.getElementById('auth-container');
+            const sessionStr    = localStorage.getItem('session');
+            if (sessionStr && authContainer) {
+                try {
+                    const session = JSON.parse(sessionStr);
+                    if (session && (session.token || session.isLoggedIn)) {
+                        const userName = session.nama || 'Customer';
+                        authContainer.innerHTML = `
+                            <a href="profil.html" class="text-sm font-semibold text-slate-700 hover:text-[#F27024] transition flex items-center gap-1.5">
+                                <i class="fa-regular fa-user" style="color:#F27024"></i> Hai, ${userName}
+                            </a>
+                            <button onclick="handleLogout()" class="text-sm font-semibold text-red-500 hover:text-red-700 transition flex items-center gap-1">
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                            </button>`;
+                    }
+                } catch(e) {}
+            }
+
+            // Rating bintang interaktif
+            const stars = document.querySelectorAll('#rating-stars i');
+            function refreshStars(activeVal) {
+                stars.forEach(s => {
+                    const sv = Number(s.dataset.val);
+                    s.className = sv <= activeVal
+                        ? 'fa-solid fa-star text-brand-orange cursor-pointer hover:scale-110 transition-transform'
+                        : 'fa-regular fa-star text-slate-300 cursor-pointer hover:scale-110 transition-transform';
+                });
+            }
+            stars.forEach(star => {
+                star.addEventListener('click', () => {
+                    const val = Number(star.dataset.val);
+                    document.getElementById('filter-rating').value = val;
+                    document.getElementById('rating-label').textContent = val > 0 ? `${val}.0+` : 'Semua';
+                    refreshStars(val);
+                });
+                star.addEventListener('mouseenter', () => refreshStars(Number(star.dataset.val)));
+                star.addEventListener('mouseleave', () => refreshStars(Number(document.getElementById('filter-rating').value)));
+            });
+
+            // Event bindings
+            document.getElementById('search-input').addEventListener('input',   () => { currentPage = 1; applyFilters(); });
+            document.getElementById('search-input').addEventListener('keypress', e => { if (e.key === 'Enter') { currentPage = 1; applyFilters(); } });
+            document.getElementById('btn-search').addEventListener('click',     () => { currentPage = 1; applyFilters(); });
+            document.getElementById('sort-select').addEventListener('change',   () => { currentPage = 1; applyFilters(); });
+            document.getElementById('btn-terapkan').addEventListener('click',   () => { currentPage = 1; applyFilters(); });
+            document.getElementById('btn-reset').addEventListener('click', () => {
+                document.getElementById('search-input').value       = '';
+                document.getElementById('filter-lokasi').value      = '';
+                document.getElementById('filter-budget-min').value  = '';
+                document.getElementById('filter-budget-max').value  = '';
+                document.getElementById('filter-rating').value      = '0';
+                document.getElementById('rating-label').textContent = 'Semua';
+                document.querySelectorAll('.filter-kategori').forEach(cb => cb.checked = false);
+                document.getElementById('sort-select').value        = 'relevansi';
+                refreshStars(0);
+                currentPage = 1; applyFilters();
+            });
+
+            // Fetch awal
+            fetch("http://localhost:3000/vendors/approved")
+                .then(res => res.json())
+                .then(async vendors => {
+                    allVendors = vendors;
+                    try { allServices = await fetch("http://localhost:3000/services").then(r => r.json()); }
+                    catch(e) { console.error("Gagal load services:", e); }
+                    applyFilters();
+                })
+                .catch(err => {
+                    console.error("Gagal load vendors:", err);
+                    document.getElementById("vendor-grid").innerHTML = `
+                        <div class="col-span-full flex flex-col items-center justify-center py-16">
+                            <i class="fa-solid fa-triangle-exclamation text-4xl mb-3 text-red-500"></i>
+                            <p class="text-sm font-medium text-red-500">Gagal memuat vendor. Pastikan server API Gateway berjalan.</p>
+                        </div>`;
+                });
+        });
+
+        // ── Filter + Sort ─────────────────────────────────
+        function applyFilters() {
+            const query     = document.getElementById('search-input').value.toLowerCase().trim();
+            const lokasi    = document.getElementById('filter-lokasi').value.toLowerCase().trim();
+            const budgetMin = Number(document.getElementById('filter-budget-min').value) || 0;
+            const budgetMax = Number(document.getElementById('filter-budget-max').value) || Infinity;
+            const minRating = Number(document.getElementById('filter-rating').value) || 0;
+            const kategori  = Array.from(document.querySelectorAll('.filter-kategori:checked')).map(cb => cb.value);
+            const sort      = document.getElementById('sort-select').value;
+
+            const vendorWithPrice = allVendors
+                .map(v => {
+                    const svcs     = allServices.filter(s => Number(s.id_vendor) === Number(v.id_vendor));
+                    const minHarga = svcs.length ? Math.min(...svcs.map(s => Number(s.harga))) : 0;
+                    return { ...v, _minHarga: minHarga, _hasServices: svcs.length > 0 };
+                })
+                .filter(v => v._hasServices); // sembunyikan vendor tanpa paket
+
+            let result = vendorWithPrice.filter(v => {
+                const nama    = (v.nama_usaha || '').toLowerCase();
+                const desk    = (v.deskripsi  || '').toLowerCase();
+                const jenis   = (v.jenis_jasa || '').toLowerCase();
+                const lokasiV = (v.alamat     || '').toLowerCase();
+                const rating  = Number(v.rating_avg) || 0;
+
+                if (query && !nama.includes(query) && !desk.includes(query) && !jenis.includes(query)) return false;
+                if (lokasi && !lokasiV.includes(lokasi)) return false;
+                if (v._minHarga > 0) {
+                    if (budgetMin > 0 && v._minHarga < budgetMin) return false;
+                    if (budgetMax < Infinity && v._minHarga > budgetMax) return false;
+                }
+                if (minRating > 0 && rating < minRating) return false;
+                if (kategori.length > 0) {
+                    const match = kategori.some(cat => {
+                        if (cat === 'foto')  return nama.includes('foto')  || nama.includes('photo') || jenis.includes('foto')  || desk.includes('foto');
+                        if (cat === 'video') return nama.includes('video') || jenis.includes('video') || desk.includes('video');
+                        if (cat === 'dekor') return nama.includes('dekor') || nama.includes('decor') || jenis.includes('dekor') || desk.includes('dekor');
+                        if (cat === 'kater') return nama.includes('kater') || nama.includes('cater') || jenis.includes('kater') || jenis.includes('cater') || desk.includes('kater');
+                        return false;
+                    });
+                    if (!match) return false;
+                }
+                return true;
+            });
+
+            if (sort === 'harga-asc')   result.sort((a, b) => a._minHarga - b._minHarga);
+            if (sort === 'harga-desc')  result.sort((a, b) => b._minHarga - a._minHarga);
+            if (sort === 'rating-desc') result.sort((a, b) => (Number(b.rating_avg) || 0) - (Number(a.rating_avg) || 0));
+
+            filteredList = result;
+            currentPage  = 1;
+            renderPage();
+        }
+
+        // ── Render halaman ────────────────────────────────
+        function renderPage() {
+            const grid       = document.getElementById("vendor-grid");
+            const totalPages = Math.ceil(filteredList.length / PAGE_SIZE);
+            const start      = (currentPage - 1) * PAGE_SIZE;
+            const pageItems  = filteredList.slice(start, start + PAGE_SIZE);
+
+            document.getElementById('meta-info').innerHTML =
+                `Menampilkan <span class="font-bold text-slate-800">${filteredList.length} vendor</span>` +
+                (filteredList.length !== allVendors.length ? ` dari ${allVendors.length} total` : '');
+
+            grid.innerHTML = "";
+
+            if (filteredList.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center py-16 text-slate-400">
+                        <i class="fa-regular fa-folder-open text-5xl mb-4 text-slate-300"></i>
+                        <h3 class="text-base font-bold text-slate-600 mb-1">Vendor tidak ditemukan</h3>
+                        <p class="text-sm text-slate-400">Coba ubah filter atau kata kunci pencarian Anda</p>
+                    </div>`;
+                document.getElementById('pagination-controls').classList.add('hidden');
+                return;
+            }
+
+            pageItems.forEach(vendor => {
+                const waNumber = (vendor.link_whatsapp || '').replace(/\D/g, '');
+                grid.innerHTML += `
+                    <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm card-hover transition-all duration-300">
+                        <div class="h-48 bg-slate-100">
+                            <img src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-5">
+                            <div class="flex justify-between items-start">
+                                <h3 class="text-base font-bold text-slate-900 leading-tight">${vendor.nama_usaha}</h3>
+                                <span class="text-sm font-semibold text-orange-500 flex-shrink-0 ml-2">⭐ ${Number(vendor.rating_avg || 0).toFixed(1)}</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-1">${vendor.alamat || '-'}</p>
+                            ${vendor.jenis_jasa ? `<span class="inline-block mt-1 text-[10px] font-bold bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full">${vendor.jenis_jasa}</span>` : ''}
+                            <div class="mt-3">
+                                <span class="text-xs text-gray-400 block uppercase font-bold">Mulai Dari</span>
+                                <span class="text-lg font-bold text-slate-900">Rp ${vendor._minHarga.toLocaleString("id-ID")}</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 mt-4">
+                                <a href="detail-vendor.html?id=${vendor.id_vendor}" class="text-center border border-gray-200 text-slate-700 font-semibold py-2 rounded-lg text-sm hover:bg-slate-50 transition">Lihat Detail</a>
+                                ${waNumber
+                                    ? `<a href="https://wa.me/${waNumber}" target="_blank" class="bg-[#0F172A] hover:bg-slate-800 text-white text-center font-semibold py-2 rounded-lg text-sm transition">WhatsApp</a>`
+                                    : `<span class="bg-slate-100 text-slate-400 text-center font-semibold py-2 rounded-lg text-sm cursor-not-allowed" title="Vendor belum menambahkan nomor WhatsApp">WhatsApp</span>`
+                                }
+                            </div>
+                        </div>
+                    </div>`;
+            });
+
+            // Pagination
+            const controls = document.getElementById('pagination-controls');
+            if (totalPages <= 1) { controls.classList.add('hidden'); return; }
+            controls.classList.remove('hidden');
+            controls.innerHTML = '';
+
+            const btnPrev = document.createElement('button');
+            btnPrev.className = 'w-10 h-10 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-slate-50 btn-transition disabled:opacity-30';
+            btnPrev.innerHTML = '<i class="fa-solid fa-chevron-left text-sm"></i>';
+            btnPrev.disabled  = currentPage === 1;
+            btnPrev.onclick   = () => { currentPage--; renderPage(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+            controls.appendChild(btnPrev);
+
+            buildPageRange(currentPage, totalPages).forEach(p => {
+                if (p === '…') {
+                    const el = document.createElement('span');
+                    el.className = 'w-10 h-10 flex items-center justify-center text-slate-400';
+                    el.textContent = '…';
+                    controls.appendChild(el);
+                } else {
+                    const btn = document.createElement('button');
+                    btn.textContent = p;
+                    btn.className   = p === currentPage
+                        ? 'w-10 h-10 rounded-lg bg-[#0F172A] text-white font-semibold shadow-md'
+                        : 'w-10 h-10 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 font-semibold btn-transition';
+                    btn.onclick = () => { currentPage = p; renderPage(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+                    controls.appendChild(btn);
+                }
+            });
+
+            const btnNext = document.createElement('button');
+            btnNext.className = 'w-10 h-10 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 btn-transition disabled:opacity-30';
+            btnNext.innerHTML = '<i class="fa-solid fa-chevron-right text-sm"></i>';
+            btnNext.disabled  = currentPage === totalPages;
+            btnNext.onclick   = () => { currentPage++; renderPage(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+            controls.appendChild(btnNext);
+        }
+
+        function buildPageRange(cur, total) {
+            if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+            if (cur <= 4)   return [1, 2, 3, 4, 5, '…', total];
+            if (cur >= total - 3) return [1, '…', total-4, total-3, total-2, total-1, total];
+            return [1, '…', cur - 1, cur, cur + 1, '…', total];
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('session');
+            window.location.href = '../public/login.html';
+        }
+    </script>
+</body>
+</html>

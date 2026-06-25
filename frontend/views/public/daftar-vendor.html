@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar sebagai Vendor - EventVendorHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-[#f8f9fc] min-h-screen flex">
+
+    <!-- Panel Kiri -->
+    <div class="hidden lg:flex lg:w-2/5 bg-[#0f172a] p-12 flex-col justify-between relative text-white overflow-hidden">
+        <div class="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&q=80&w=1000')] bg-cover bg-center"></div>
+        <div class="relative z-10 flex items-center gap-2 font-bold text-lg cursor-pointer" onclick="window.location.href='index.html'">
+            <i class="fa-solid fa-calendar-check text-orange-500 text-xl"></i> EventVendorHub
+        </div>
+        <div class="relative z-10 space-y-6">
+            <div class="inline-flex items-center gap-2 bg-orange-500/20 border border-orange-500/30 text-orange-300 text-xs font-bold px-3 py-1.5 rounded-full">
+                <i class="fa-solid fa-store"></i> Vendor Portal
+            </div>
+            <h1 class="text-3xl font-extrabold tracking-tight leading-tight">Bergabung sebagai Mitra Vendor</h1>
+            <p class="text-sm text-gray-300 leading-relaxed">Daftarkan bisnis event Anda dan jangkau ribuan calon klien di seluruh Indonesia.</p>
+            <div class="space-y-3 pt-2">
+                <div class="flex items-center gap-3 text-sm text-gray-300">
+                    <div class="w-8 h-8 bg-orange-500/20 rounded-lg flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-check text-orange-400 text-xs"></i></div>
+                    Profil bisnis tampil di platform
+                </div>
+                <div class="flex items-center gap-3 text-sm text-gray-300">
+                    <div class="w-8 h-8 bg-orange-500/20 rounded-lg flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-check text-orange-400 text-xs"></i></div>
+                    Terima booking langsung dari customer
+                </div>
+                <div class="flex items-center gap-3 text-sm text-gray-300">
+                    <div class="w-8 h-8 bg-orange-500/20 rounded-lg flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-check text-orange-400 text-xs"></i></div>
+                    Kelola layanan dan analitik bisnis
+                </div>
+                <div class="flex items-center gap-3 text-sm text-amber-300 bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 mt-4">
+                    <i class="fa-solid fa-shield-halved text-amber-400 text-lg flex-shrink-0"></i>
+                    <span class="text-xs">Akun vendor memerlukan <strong>verifikasi admin</strong> sebelum profil Anda tampil di platform.</span>
+                </div>
+            </div>
+        </div>
+        <div class="relative z-10 text-[10px] text-gray-500">© 2025 EventVendorHub</div>
+    </div>
+
+    <!-- Panel Kanan -->
+    <div class="w-full lg:w-3/5 flex items-center justify-center p-6 sm:p-12 bg-white overflow-y-auto">
+        <div class="w-full max-w-lg space-y-6 py-8">
+
+            <!-- Header -->
+            <div>
+                <h2 class="text-2xl font-black text-slate-900 tracking-tight">Daftar sebagai Vendor</h2>
+                <p class="text-xs text-gray-400 mt-1">Lengkapi data bisnis Anda. Admin akan memverifikasi sebelum profil aktif.</p>
+            </div>
+
+            <!-- Info Banner Verifikasi -->
+            <div class="flex items-start gap-3 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3">
+                <i class="fa-solid fa-circle-info text-blue-500 mt-0.5 flex-shrink-0"></i>
+                <div class="text-xs text-blue-700">
+                    <strong class="block mb-0.5">Proses Verifikasi Vendor</strong>
+                    Setelah mendaftar, admin akan meninjau data bisnis Anda. Anda dapat login setelah terdaftar, namun profil akan tampil di platform setelah disetujui admin.
+                </div>
+            </div>
+
+            <!-- Error Banner -->
+            <div id="error-banner" class="hidden items-center gap-2 bg-red-50 border border-red-200 text-red-600 text-xs font-semibold rounded-xl px-4 py-3">
+                <i class="fa-solid fa-circle-exclamation flex-shrink-0"></i>
+                <span id="error-text">Terjadi kesalahan.</span>
+            </div>
+
+            <form id="vendor-register-form" class="space-y-4">
+                <!-- Section: Data Akun -->
+                <div class="border-b border-gray-100 pb-4">
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Data Akun</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">Nama Pemilik <span class="text-red-500">*</span></label>
+                            <input id="field-nama" type="text" required placeholder="Nama lengkap pemilik usaha"
+                                class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">Email <span class="text-red-500">*</span></label>
+                            <input id="field-email" type="email" required placeholder="email@bisnis.com"
+                                class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-1">Password <span class="text-red-500">*</span></label>
+                                <input id="field-password" type="password" required placeholder="Min. 6 karakter"
+                                    class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-1">Konfirmasi Password <span class="text-red-500">*</span></label>
+                                <input id="field-confirm" type="password" required placeholder="Ulangi password"
+                                    class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">No. Telepon / WhatsApp</label>
+                            <input id="field-no-hp" type="text" placeholder="+62 812 3456 7890"
+                                class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: Data Bisnis -->
+                <div>
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Data Bisnis <span class="text-gray-400 font-normal normal-case">(opsional, bisa dilengkapi setelah login)</span></h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">Nama Usaha</label>
+                            <input id="field-nama-usaha" type="text" placeholder="Contoh: Lumina Photography Studio"
+                                class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-1">Kategori Jasa</label>
+                                <select id="field-jenis-jasa"
+                                    class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                    <option value="">Pilih kategori...</option>
+                                    <option value="Fotografi">Fotografi</option>
+                                    <option value="Videografi">Videografi</option>
+                                    <option value="Catering">Catering</option>
+                                    <option value="Dekorasi">Dekorasi</option>
+                                    <option value="MC / Sound">MC / Sound</option>
+                                    <option value="Wedding Organizer">Wedding Organizer</option>
+                                    <option value="Venue">Venue</option>
+                                    <option value="Entertainment">Entertainment</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-1">Kota / Alamat</label>
+                                <input id="field-alamat" type="text" placeholder="Jakarta Selatan"
+                                    class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">Deskripsi Singkat Bisnis</label>
+                            <textarea id="field-deskripsi" rows="2" placeholder="Ceritakan layanan yang Anda tawarkan..."
+                                class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="submit-btn" type="submit"
+                    class="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3.5 rounded-xl text-sm transition shadow-md flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-store"></i>
+                    <span id="submit-label">Daftar sebagai Vendor</span>
+                </button>
+            </form>
+
+            <div class="text-center space-y-2">
+                <p class="text-xs text-gray-500">Ingin daftar sebagai customer?
+                    <a href="register.html" class="text-slate-900 font-bold hover:underline">Daftar di sini</a>
+                </p>
+                <p class="text-xs text-gray-500">Sudah punya akun?
+                    <a href="login.html" class="text-slate-900 font-bold hover:underline">Masuk</a>
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal Sukses -->
+    <div id="success-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 text-center space-y-5">
+            <div class="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto">
+                <i class="fa-solid fa-check text-emerald-500 text-2xl"></i>
+            </div>
+            <div>
+                <h3 class="text-xl font-black text-slate-900">Pendaftaran Berhasil!</h3>
+                <p class="text-sm text-gray-500 mt-2 leading-relaxed">
+                    Akun vendor Anda telah dibuat. Admin akan meninjau dan memverifikasi bisnis Anda.
+                    Anda bisa login sekarang untuk melengkapi profil.
+                </p>
+            </div>
+            <div class="bg-amber-50 border border-amber-100 rounded-xl p-3 text-xs text-amber-700 text-left flex items-start gap-2">
+                <i class="fa-solid fa-clock mt-0.5 flex-shrink-0"></i>
+                <span>Profil vendor akan tampil di platform setelah mendapat persetujuan dari admin.</span>
+            </div>
+            <button onclick="window.location.href='login.html'" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl text-sm transition">
+                Masuk ke Akun Saya
+            </button>
+        </div>
+    </div>
+
+    <script>
+    const API = 'http://localhost:3000';
+
+    function showError(msg) {
+        const b = document.getElementById('error-banner');
+        document.getElementById('error-text').textContent = msg;
+        b.classList.remove('hidden');
+        b.classList.add('flex');
+    }
+    function hideError() {
+        const b = document.getElementById('error-banner');
+        b.classList.add('hidden');
+        b.classList.remove('flex');
+    }
+
+    document.getElementById('vendor-register-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        hideError();
+
+        const nama      = document.getElementById('field-nama').value.trim();
+        const email     = document.getElementById('field-email').value.trim();
+        const password  = document.getElementById('field-password').value;
+        const confirm   = document.getElementById('field-confirm').value;
+        const btn       = document.getElementById('submit-btn');
+        const label     = document.getElementById('submit-label');
+
+        // Validasi
+        if (!nama || !email || !password) { showError('Nama, email, dan password wajib diisi.'); return; }
+        if (password !== confirm)         { showError('Password dan konfirmasi tidak cocok.'); return; }
+        if (password.length < 6)          { showError('Password minimal 6 karakter.'); return; }
+
+        btn.disabled = true;
+        label.textContent = 'Mendaftar...';
+
+        try {
+            // 1. Buat akun user dengan role vendor
+            const noHp = document.getElementById('field-no-hp').value.trim();
+            const authRes = await fetch(`${API}/auth/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nama, email, password, role: 'vendor', no_hp: noHp || null })
+            });
+
+            if (!authRes.ok) {
+                const err = await authRes.json().catch(() => ({}));
+                throw new Error(err.message || 'Registrasi gagal. Email mungkin sudah digunakan.');
+            }
+
+            const authData = await authRes.json();
+            const userId   = authData.user_id || authData.id;
+
+            // 2. Login otomatis untuk dapat token
+            const loginRes = await fetch(`${API}/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (loginRes.ok) {
+                const loginData = await loginRes.json();
+                const token     = loginData.token;
+                const newUserId = loginData.user?.id_user || userId;
+
+                // 3. Buat profil vendor otomatis
+                // Gunakan nama pemilik sebagai fallback jika nama usaha kosong
+                const namaUsaha  = document.getElementById('field-nama-usaha').value.trim() || nama || email;
+                const jenisJasa  = document.getElementById('field-jenis-jasa').value;
+                const alamat     = document.getElementById('field-alamat').value.trim();
+                const deskripsi  = document.getElementById('field-deskripsi').value.trim();
+                const whatsapp   = noHp; // gunakan no. telepon dari Data Akun
+
+                // Buat vendor profile — status_verifikasi default 'pending' di database
+                const vendorRes = await fetch(`${API}/vendors/from-user`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        id_user:      newUserId,
+                        nama_usaha:   namaUsaha,
+                        nama_user:    nama,
+                        jenis_jasa:   jenisJasa  || null,
+                        alamat:       alamat      || null,
+                        deskripsi:    deskripsi   || null,
+                        link_whatsapp: whatsapp   || null
+                    })
+                });
+
+                if (!vendorRes.ok) {
+                    const errData = await vendorRes.json().catch(() => ({}));
+                    throw new Error(errData.message || 'Gagal membuat profil vendor. Coba lagi.');
+                }
+            }
+
+            // Tampilkan modal sukses
+            document.getElementById('success-modal').classList.remove('hidden');
+
+        } catch (err) {
+            showError(err.message);
+            btn.disabled = false;
+            label.textContent = 'Daftar sebagai Vendor';
+        }
+    });
+    </script>
+</body>
+</html>

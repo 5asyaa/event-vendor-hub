@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Vendor - EventVendorHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#f9f9fb] text-slate-800 font-['Inter'] min-h-screen flex">
+
+<aside class="w-64 bg-[#0a1120] text-gray-400 p-6 flex flex-col justify-between hidden md:flex min-h-screen sticky top-0">
+    <div class="space-y-8">
+        <div><span class="block font-bold text-lg text-white tracking-tight">EventVendorHub</span><span class="text-[10px] uppercase tracking-wider text-gray-500 block mt-0.5">Vendor Portal</span></div>
+        <nav class="space-y-1 text-sm font-medium">
+            <a href="vendor-dashboard.html" class="flex items-center gap-3 bg-orange-500 text-white font-bold px-4 py-3 rounded-xl shadow-sm"><i class="fa-solid fa-chart-pie"></i> Dasbor</a>
+            <a href="pesanan-masuk.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-regular fa-calendar-check"></i> Pemesanan</a>
+            <a href="manajemen-layanan.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-layer-group"></i> Layanan Saya</a>
+            <a href="analitik-vendor.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-chart-line"></i> Analisis</a>
+        </nav>
+    </div>
+    <div class="space-y-4">
+        <a href="profil-vendor.html" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition"><i class="fa-solid fa-user"></i> Lihat Profil</a>
+        <a href="#" onclick="doLogout()" class="flex items-center gap-3 px-4 py-2 text-sm hover:text-red-400 hover:bg-slate-900/50 rounded-lg transition"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+    </div>
+</aside>
+
+<main class="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full space-y-8">
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 id="welcome-title" class="text-2xl font-extrabold text-slate-900 tracking-tight">Selamat datang kembali...</h1>
+            <p id="welcome-desc" class="text-xs text-gray-400 mt-0.5">Memuat data dasbor Anda...</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
+        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+            <span class="text-xs text-gray-400 block font-medium">Total Pesanan</span>
+            <span id="stat-total" class="text-2xl font-extrabold text-slate-900 block mt-2">—</span>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+            <span class="text-xs text-gray-400 block font-medium">Dikonfirmasi</span>
+            <span id="stat-confirmed" class="text-2xl font-extrabold text-slate-900 block mt-2">—</span>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+            <span class="text-xs text-gray-400 block font-medium">Selesai</span>
+            <span id="stat-completed" class="text-2xl font-extrabold text-slate-900 block mt-2">—</span>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+            <span class="text-xs text-gray-400 block font-medium">Rating</span>
+            <span id="stat-rating" class="text-2xl font-extrabold text-slate-900 block mt-2">—<span class="text-sm font-normal text-gray-400">/5.0</span></span>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="flex justify-between items-center p-5 border-b border-gray-100">
+            <h3 class="font-bold text-base text-slate-900">Pesanan Masuk Terbaru</h3>
+            <a href="pesanan-masuk.html" class="text-xs font-semibold text-orange-500 hover:underline">Lihat Semua</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead>
+                    <tr class="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100">
+                        <th class="py-3 px-5">ID Pesanan</th>
+                        <th class="py-3 px-5">Pelanggan</th>
+                        <th class="py-3 px-5">Layanan</th>
+                        <th class="py-3 px-5">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="booking-table-body" class="divide-y divide-gray-100 text-gray-600 font-medium text-xs">
+                    <tr><td colspan="4" class="py-4 px-5 text-center text-gray-400">Memuat pesanan masuk...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<script>
+const API = 'http://localhost:3000';
+
+function doLogout() {
+    localStorage.removeItem('session');
+    window.location.href = '../public/login.html';
+}
+
+document.addEventListener("DOMContentLoaded", async function() {
+    const session = JSON.parse(localStorage.getItem('session') || '{}');
+    if (!session.isLoggedIn || session.role !== 'vendor') {
+        window.location.href = '../public/login.html';
+        return;
+    }
+
+    const token   = session.token || '';
+    const headers = { 'Authorization': `Bearer ${token}` };
+
+    try {
+        const [vendors, allServices, allBookings] = await Promise.all([
+            fetch(`${API}/vendors`, { headers }).then(r => r.json()),
+            fetch(`${API}/services`, { headers }).then(r => r.json()),
+            fetch(`${API}/bookings`, { headers }).then(r => r.json())
+        ]);
+
+        const currentVendor = vendors.find(v => Number(v.id_user) === Number(session.id));
+        if (!currentVendor) {
+            document.getElementById('welcome-title').innerText = "Selamat datang, Vendor!";
+            document.getElementById('welcome-desc').innerText = "Profil vendor Anda belum terdaftar di database.";
+            document.getElementById('booking-table-body').innerHTML =
+                `<tr><td colspan="4" class="py-4 px-5 text-center text-gray-400">Profil vendor belum ditemukan.</td></tr>`;
+            return;
+        }
+
+        document.getElementById('welcome-title').innerText = `Selamat datang kembali, ${currentVendor.nama_usaha}!`;
+        document.getElementById('welcome-desc').innerText = `Ringkasan performa ${currentVendor.nama_usaha} hari ini.`;
+        document.getElementById('stat-rating').innerHTML =
+            `${currentVendor.rating_avg || '0.0'}<span class="text-sm font-normal text-gray-400">/5.0</span>`;
+
+        const vendorServices = allServices.filter(s => Number(s.id_vendor) === Number(currentVendor.id_vendor));
+        const serviceIds     = vendorServices.map(s => Number(s.id_service));
+        const vendorBookings = allBookings.filter(b => serviceIds.includes(Number(b.id_service)));
+
+        document.getElementById('stat-total').innerText     = vendorBookings.length;
+        document.getElementById('stat-confirmed').innerText = vendorBookings.filter(b => b.status === 'confirmed').length;
+        document.getElementById('stat-completed').innerText = vendorBookings.filter(b => b.status === 'completed').length;
+
+        const latest     = vendorBookings.sort((a,b) => b.id_booking - a.id_booking).slice(0, 5);
+        const tableBody  = document.getElementById('booking-table-body');
+        tableBody.innerHTML = "";
+
+        if (latest.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="4" class="py-4 px-5 text-center text-gray-400">Belum ada pesanan masuk.</td></tr>`;
+            return;
+        }
+
+        const STATUS_MAP = {
+            confirmed: { cls: 'bg-emerald-50 text-emerald-600 border border-emerald-100', label: 'Diterima' },
+            rejected:  { cls: 'bg-red-50 text-red-600 border border-red-100',             label: 'Ditolak' },
+            completed: { cls: 'bg-blue-50 text-blue-600 border border-blue-100',           label: 'Selesai' },
+            pending:   { cls: 'bg-yellow-50 text-yellow-600 border border-yellow-100',     label: 'Menunggu' }
+        };
+
+        for (const booking of latest) {
+            const service     = vendorServices.find(s => Number(s.id_service) === Number(booking.id_service));
+            const serviceName = service ? service.nama_paket : `Layanan #${booking.id_service}`;
+
+            let customerName = `Pelanggan #${booking.id_user}`;
+            try {
+                const u = await fetch(`${API}/auth/users/${booking.id_user}`);
+                if (u.ok) { const ud = await u.json(); customerName = ud.nama || customerName; }
+            } catch(e) {}
+
+            const st = STATUS_MAP[booking.status] || { cls: 'bg-orange-50 text-orange-600 border border-orange-100', label: booking.status };
+
+            tableBody.innerHTML += `
+                <tr class="hover:bg-gray-50/50">
+                    <td class="py-4 px-5 font-bold text-slate-900">#ORD-${booking.id_booking}</td>
+                    <td class="py-4 px-5">${customerName}</td>
+                    <td class="py-4 px-5">${serviceName}</td>
+                    <td class="py-4 px-5"><span class="${st.cls} text-[10px] font-bold px-3 py-1 rounded-full">${st.label}</span></td>
+                </tr>`;
+        }
+
+    } catch (error) {
+        console.error("Gagal memuat data dasbor vendor:", error);
+        document.getElementById('welcome-desc').innerText = "Gagal memuat data dari database.";
+    }
+});
+</script>
+</body>
+</html>

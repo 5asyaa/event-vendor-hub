@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Paket Layanan - Vendor Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#f9f9fb] text-slate-800 font-['Inter'] min-h-screen flex">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-[#0a1120] text-gray-400 p-6 flex flex-col justify-between hidden md:flex min-h-screen sticky top-0">
+        <div class="space-y-8">
+            <div class="cursor-pointer hover:opacity-80 transition-opacity" onclick="window.location.reload()">
+                <span class="block font-bold text-lg text-white tracking-tight">EventVendorHub</span>
+                <span class="text-[10px] uppercase tracking-wider text-gray-500 block mt-0.5">Vendor Portal</span>
+            </div>
+            <nav class="space-y-1 text-sm font-medium">
+                <a href="vendor-dashboard.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-chart-pie"></i> Dasbor</a>
+                <a href="pesanan-masuk.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-regular fa-calendar-check"></i> Pemesanan</a>
+                <a href="manajemen-layanan.html" class="flex items-center gap-3 bg-orange-500 text-white font-bold px-4 py-3 rounded-xl shadow-sm hover:bg-orange-600 transition"><i class="fa-solid fa-layer-group"></i> Layanan Saya</a>
+                <a href="analitik-vendor.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-chart-line"></i> Analisis</a>
+            </nav>
+        </div>
+        <div class="space-y-4">
+            <button onclick="window.location.href='profil-vendor.html'" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition"><i class="fa-solid fa-user"></i> Lihat Profil</button>
+            <a href="#" onclick="window.location.href='../public/login.html'" class="flex items-center gap-3 px-4 py-2 text-sm hover:text-red-400 hover:bg-slate-900/50 rounded-lg transition"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 md:p-10 max-w-4xl mx-auto w-full space-y-6">
+        <div class="flex items-center gap-3">
+            <button onclick="window.location.href='manajemen-layanan.html'" class="w-8 h-8 rounded-full bg-white border border-gray-100 flex items-center justify-center hover:bg-gray-50 transition shadow-sm">
+                <i class="fa-solid fa-arrow-left text-xs text-slate-600"></i>
+            </button>
+            <div>
+                <h1 class="text-2xl font-extrabold text-slate-900">Tambah Paket Layanan Baru</h1>
+                <p class="text-xs text-gray-400 mt-0.5">Isi informasi detail paket layanan baru untuk bisnis Anda.</p>
+            </div>
+        </div>
+
+        <form id="add-service-form" class="bg-white border border-gray-100 rounded-2xl p-6 md:p-8 shadow-sm space-y-6">
+            <!-- Row 1: Nama Paket & Level -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="space-y-1.5">
+                    <label for="nama_paket" class="text-xs font-bold text-slate-700 block">Nama Paket <span class="text-red-500">*</span></label>
+                    <input type="text" id="nama_paket" required placeholder="Contoh: Paket Prasmanan Royal" class="w-full text-xs border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition duration-150">
+                </div>
+                <div class="space-y-1.5">
+                    <label for="level_paket" class="text-xs font-bold text-slate-700 block">Level Paket <span class="text-red-500">*</span></label>
+                    <select id="level_paket" required class="w-full text-xs border border-gray-200 rounded-xl px-4 py-3 bg-white focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition duration-150">
+                        <option value="" disabled selected>Pilih Level</option>
+                        <option value="Basic">Basic</option>
+                        <option value="Silver">Silver</option>
+                        <option value="Gold">Gold</option>
+                        <option value="Premium">Premium</option>
+                        <option value="Platinum">Platinum</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Row 2: Jenis Jasa & Harga -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="space-y-1.5">
+                    <label for="jenis_jasa" class="text-xs font-bold text-slate-700 block">Jenis Jasa <span class="text-red-500">*</span></label>
+                    <select id="jenis_jasa" required class="w-full text-xs border border-gray-200 rounded-xl px-4 py-3 bg-white focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition duration-150">
+                        <option value="" disabled selected>Pilih Jenis Jasa</option>
+                        <option value="Catering">Catering</option>
+                        <option value="Fotografer">Fotografer</option>
+                        <option value="Videografer">Videografer</option>
+                        <option value="Dekorasi">Dekorasi</option>
+                        <option value="Makeup Artist">Makeup Artist</option>
+                        <option value="Sound & Music">Sound & Music</option>
+                        <option value="Gedung/Venue">Gedung/Venue</option>
+                        <option value="EO">EO</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
+                </div>
+                <div class="space-y-1.5">
+                    <label for="harga" class="text-xs font-bold text-slate-700 block">Harga Dasar (Rp) <span class="text-red-500">*</span></label>
+                    <input type="number" id="harga" required min="0" placeholder="Contoh: 45000000" class="w-full text-xs border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition duration-150">
+                </div>
+            </div>
+
+            <!-- Textarea: Deskripsi Layanan -->
+            <div class="space-y-1.5">
+                <label for="deskripsi_layanan" class="text-xs font-bold text-slate-700 block">Deskripsi Layanan <span class="text-red-500">*</span></label>
+                <textarea id="deskripsi_layanan" required rows="4" placeholder="Jelaskan detail paket layanan Anda..." class="w-full text-xs border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition duration-150 resize-none"></textarea>
+            </div>
+
+            <!-- Input: Fitur -->
+            <div class="space-y-1.5">
+                <label for="fitur" class="text-xs font-bold text-slate-700 block">Fitur & Fasilitas (Pisahkan dengan koma) <span class="text-red-500">*</span></label>
+                <textarea id="fitur" required rows="2" placeholder="Contoh: Makan Siang, Kursi VIP, Sound System, Staf Profesional" class="w-full text-xs border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition duration-150 resize-none"></textarea>
+            </div>
+
+            <!-- Row 3: Gambar Paket URL & Portofolio URL -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="space-y-1.5">
+                    <label for="gambar_paket" class="text-xs font-bold text-slate-700 block">Gambar Paket</label>
+                    <input type="file" id="gambar_paket" accept="image/*" class="w-full text-xs border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition duration-150">
+                </div>
+                <div class="space-y-1.5">
+                    <label for="portofolio_url" class="text-xs font-bold text-slate-700 block">Portofolio URL</label>
+                    <input type="url" id="portofolio_url" placeholder="https://instagram.com/... (optional)" class="w-full text-xs border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition duration-150">
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex justify-end gap-3 pt-4 border-t border-gray-50">
+                <button type="button" onclick="window.location.href='manajemen-layanan.html'" class="px-5 py-3 border border-gray-200 hover:bg-gray-50 rounded-xl text-xs font-bold text-slate-600 transition">Batal</button>
+                <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-xl text-xs flex items-center justify-center gap-2 transition shadow-sm">
+                    <i class="fa-solid fa-circle-plus"></i> Tambah Paket
+                </button>
+            </div>
+        </form>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async function() {
+            const session = JSON.parse(localStorage.getItem('session') || '{}');
+            if (!session.isLoggedIn || session.role !== 'vendor') {
+                alert("Silakan login sebagai vendor terlebih dahulu!");
+                window.location.href = '../public/login.html';
+                return;
+            }
+
+            let idVendor = null;
+            try {
+                // Fetch all vendors to find current vendor's ID
+                const vendors = await fetch("http://localhost:3000/vendors").then(r => r.json());
+                const currentVendor = vendors.find(v => v.id_user == session.id);
+
+                if (!currentVendor) {
+                    alert("Profil vendor tidak ditemukan! Pastikan profil vendor terdaftar di database.");
+                    window.location.href = 'manajemen-layanan.html';
+                    return;
+                }
+                idVendor = currentVendor.id_vendor;
+            } catch (error) {
+                console.error("Gagal memuat profil vendor:", error);
+                alert("Gagal memuat profil vendor. Silakan coba lagi.");
+                window.location.href = 'manajemen-layanan.html';
+                return;
+            }
+
+            const form = document.getElementById("add-service-form");
+            form.addEventListener("submit", async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData();
+                formData.append("id_vendor", idVendor);
+                formData.append("nama_paket", document.getElementById("nama_paket").value);
+                formData.append("jenis_jasa", document.getElementById("jenis_jasa").value);
+                formData.append("harga", parseFloat(document.getElementById("harga").value));
+                formData.append("deskripsi_layanan", document.getElementById("deskripsi_layanan").value);
+                formData.append("portofolio_url", document.getElementById("portofolio_url").value || "");
+                formData.append("fitur", document.getElementById("fitur").value);
+                formData.append("level_paket", document.getElementById("level_paket").value);
+                
+                const fileInput = document.getElementById("gambar_paket");
+                if (fileInput.files.length > 0) {
+                    formData.append("gambar_paket", fileInput.files[0]);
+                }
+
+                try {
+                    const response = await fetch("http://localhost:3000/services", {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Bearer ${session.token || ''}`
+                        },
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        alert("Layanan berhasil ditambahkan!");
+                        window.location.href = "manajemen-layanan.html";
+                    } else {
+                        const err = await response.json().catch(() => ({}));
+                        alert("Gagal menambahkan layanan: " + (err.message || response.statusText || "Error"));
+                    }
+                } catch(error) {
+                    console.error("Error submitting form:", error);
+                    alert("Terjadi kesalahan koneksi saat menambahkan layanan.");
+                }
+            });
+        });
+    </script>
+</body>
+</html>

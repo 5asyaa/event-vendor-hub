@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analitis Keuangan - Vendor Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-[#f9f9fb] text-slate-800 font-['Inter'] min-h-screen flex">
+    <aside class="w-64 bg-[#0a1120] text-gray-400 p-6 flex flex-col justify-between hidden md:flex min-h-screen sticky top-0">
+        <div class="space-y-8">
+            <div class="cursor-pointer hover:opacity-80 transition-opacity" onclick="window.location.reload()">
+                <span class="block font-bold text-lg text-white tracking-tight">EventVendorHub</span>
+                <span class="text-[10px] uppercase tracking-wider text-gray-500 block mt-0.5">Vendor Portal</span>
+            </div>
+            <nav class="space-y-1 text-sm font-medium">
+                <a href="vendor-dashboard.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-chart-pie"></i> Dasbor</a>
+                <a href="pesanan-masuk.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-regular fa-calendar-check"></i> Pemesanan</a>
+                <a href="manajemen-layanan.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-layer-group"></i> Layanan Saya</a>
+                <a href="analitik-vendor.html" class="flex items-center gap-3 bg-orange-500 text-white font-bold px-4 py-3 rounded-xl shadow-sm hover:bg-orange-600 transition"><i class="fa-solid fa-chart-line"></i> Analisis</a>
+            </nav>
+        </div>
+        <div class="space-y-4">
+            <a href="profil-vendor.html" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition"><i class="fa-solid fa-user"></i> Lihat Profil</a>
+            <a href="#" onclick="window.location.href='../public/login.html'" class="flex items-center gap-3 px-4 py-2 text-sm hover:text-red-400 hover:bg-slate-900/50 rounded-lg transition"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full space-y-6">
+        <div><h1 class="text-2xl font-extrabold text-slate-900">Analytics & Keuangan</h1><p class="text-xs text-gray-400 mt-0.5">Pantau performa bisnis dan pendapatan Anda.</p></div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-center"><div><span class="text-xs text-gray-400 font-bold block">Total Pendapatan</span><span id="stat-revenue" class="text-xl font-black text-slate-900 mt-1 block">Rp 0</span><span class="text-[10px] text-emerald-600 font-bold mt-1 block">Dari pemesanan selesai</span></div><div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center"><i class="fa-solid fa-wallet"></i></div></div>
+            <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-center"><div><span class="text-xs text-gray-400 font-bold block">Saldo Menunggu Pencairan</span><span id="stat-pending-balance" class="text-xl font-black text-slate-900 mt-1 block">Rp 0</span><span class="text-[10px] text-gray-400 font-medium mt-1 block">Dari pemesanan aktif</span></div><div class="w-10 h-10 bg-orange-50 text-orange-600 rounded-xl flex items-center justify-center"><i class="fa-regular fa-calendar"></i></div></div>
+            <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-center"><div><span class="text-xs text-gray-400 font-bold block">Rating Global</span><span id="stat-rating-val" class="text-xl font-black text-slate-900 mt-1 block">0.0<span class="text-xs text-gray-400"> /5</span></span><span id="stat-rating-count" class="text-[10px] text-gray-400 font-medium mt-1 block">Berdasarkan 0 ulasan</span></div><div class="w-10 h-10 bg-amber-50 text-amber-500 rounded-xl flex items-center justify-center"><i class="fa-solid fa-star"></i></div></div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                <h3 class="font-bold text-sm text-slate-900 mb-4">Tren Pendapatan & Booking</h3>
+                <div class="h-64"><canvas id="vendorTrendChart"></canvas></div>
+            </div>
+            <div class="space-y-6">
+                <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm h-fit">
+                    <h3 class="font-bold text-sm text-slate-900 mb-3">Ulasan Terbaru</h3>
+                    <div id="reviews-container" class="space-y-3 max-h-60 overflow-y-auto">
+                        <p class="text-xs text-gray-400">Memuat ulasan...</p>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm h-fit">
+                    <div class="flex items-center gap-2 mb-3 text-[#b45309]">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <h3 class="font-bold text-sm text-slate-900">Saran & Rekomendasi</h3>
+                    </div>
+                    <ul id="suggestions-container" class="text-xs space-y-2 text-slate-600 list-disc pl-4">
+                        <p class="text-xs text-gray-400">Memuat saran...</p>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async function() {
+            const session = JSON.parse(localStorage.getItem('session') || '{}');
+            if (!session.isLoggedIn || session.role !== 'vendor') {
+                window.location.href = '../public/login.html';
+                return;
+            }
+
+            const token   = session.token || '';
+            const headers = { 'Authorization': `Bearer ${token}` };
+
+            try {
+                const vendorsRes = await fetch("http://localhost:3000/vendors", { headers });
+                const vendors = await vendorsRes.json();
+                const currentVendor = vendors.find(v => Number(v.id_user) === Number(session.id));
+
+                if (!currentVendor) {
+                    document.getElementById('stat-revenue').innerText = 'Rp 0';
+                    return;
+                }
+
+                const idVendor = currentVendor.id_vendor;
+
+                const servicesRes = await fetch("http://localhost:3000/services", { headers });
+                const services = await servicesRes.json();
+                const vendorServices = services.filter(s => Number(s.id_vendor) === Number(idVendor));
+                const vendorServiceIds = vendorServices.map(s => Number(s.id_service));
+
+                const bookingsRes = await fetch("http://localhost:3000/bookings", { headers });
+                const bookings = await bookingsRes.json();
+                const vendorBookings = bookings.filter(b => vendorServiceIds.includes(Number(b.id_service)));
+
+                const completedBookings = vendorBookings.filter(b => b.status === 'completed');
+                const pendingBalanceBookings = vendorBookings.filter(b => b.status === 'confirmed');
+
+                const totalRevenue = completedBookings.reduce((sum, b) => sum + Number(b.total_harga), 0);
+                const pendingBalance = pendingBalanceBookings.reduce((sum, b) => sum + Number(b.total_harga), 0);
+
+                document.getElementById('stat-revenue').innerText = `Rp ${totalRevenue.toLocaleString('id-ID')}`;
+                document.getElementById('stat-pending-balance').innerText = `Rp ${pendingBalance.toLocaleString('id-ID')}`;
+
+                const reviewsRes = await fetch("http://localhost:3000/reviews");
+                const reviews = await reviewsRes.json();
+                const vendorReviews = reviews.filter(rev => Number(rev.id_vendor) === Number(idVendor));
+
+                let avgRating = 0;
+                if (vendorReviews.length > 0) {
+                    const sumRating = vendorReviews.reduce((sum, rev) => sum + Number(rev.skor_rating), 0);
+                    avgRating = (sumRating / vendorReviews.length).toFixed(1);
+                }
+                document.getElementById('stat-rating-val').innerHTML = `${avgRating}<span class="text-xs text-gray-400"> /5</span>`;
+                document.getElementById('stat-rating-count').innerText = `Berdasarkan ${vendorReviews.length} ulasan`;
+
+                // 7. Render Ulasan Terbaru secara dinamis
+                const reviewsContainer = document.getElementById('reviews-container');
+                reviewsContainer.innerHTML = "";
+
+                if (vendorReviews.length === 0) {
+                    reviewsContainer.innerHTML = `<p class="text-xs text-gray-400">Belum ada ulasan dari pelanggan.</p>`;
+                } else {
+                    for (const rev of vendorReviews.slice(0, 10)) { // Ambil maks 10 ulasan terbaru
+                        let customerName = `Pelanggan #${rev.id_user}`;
+                        try {
+                            const userRes = await fetch(`http://localhost:3000/auth/users/${rev.id_user}`);
+                            if (userRes.ok) {
+                                const userData = await userRes.json();
+                                customerName = userData.nama || customerName;
+                            }
+                        } catch(e) {
+                            console.error(e);
+                        }
+
+                        const stars = "★".repeat(Number(rev.skor_rating)) + "☆".repeat(5 - Number(rev.skor_rating));
+                        reviewsContainer.innerHTML += `
+                            <div class="text-xs p-3 bg-gray-50 rounded-xl space-y-1">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-bold block">${customerName}</span>
+                                    <span class="text-amber-500 font-bold">${stars}</span>
+                                </div>
+                                <p class="text-gray-500">${rev.komentar || 'Tidak ada komentar.'}</p>
+                                <span class="text-[9px] text-gray-400 block">${rev.tanggal_review}</span>
+                            </div>
+                        `;
+                    }
+                }
+
+                // 8. Generate saran & rekomendasi bisnis dinamis
+                const suggestionsContainer = document.getElementById('suggestions-container');
+                suggestionsContainer.innerHTML = "";
+                const suggestionsList = [];
+
+                if (vendorReviews.length > 0) {
+                    if (Number(avgRating) >= 4.5) {
+                        suggestionsList.push("Pertahankan kualitas pelayanan luar biasa Anda! Pelanggan sangat puas dengan performa Anda.");
+                        suggestionsList.push(`Rating Anda sangat tinggi (${avgRating}/5). Pertimbangkan untuk menawarkan paket premium atau menyesuaikan harga layanan.`);
+                    } else if (Number(avgRating) >= 3.5) {
+                        suggestionsList.push("Layanan Anda dinilai cukup baik. Namun, perhatikan komentar ulasan dari pelanggan untuk menyempurnakan detail.");
+                        suggestionsList.push("Fokus pada kecepatan respon chat dan ketepatan waktu pengiriman/layanan untuk menaikkan kepuasan pelanggan.");
+                    } else {
+                        suggestionsList.push("⚠️ Perhatian: Rating rata-rata Anda di bawah 3.5. Evaluasi keluhan ulasan terbaru dan lakukan perbaikan menyeluruh.");
+                        suggestionsList.push("Hubungi pelanggan yang kurang puas secara pribadi untuk memberikan permohonan maaf atau kompensasi guna memulihkan reputasi.");
+                    }
+
+                    // Deteksi kata kunci ulasan
+                    let hasFoodIssue = false;
+                    let hasPunctualityIssue = false;
+                    let hasPriceIssue = false;
+                    let hasCommIssue = false;
+
+                    vendorReviews.forEach(rev => {
+                        const comment = (rev.komentar || "").toLowerCase();
+                        if (comment.includes("makan") || comment.includes("rasa") || comment.includes("katering") || comment.includes("basi") || comment.includes("dingin") || comment.includes("porsi")) {
+                            hasFoodIssue = true;
+                        }
+                        if (comment.includes("lambat") || comment.includes("telat") || comment.includes("jam") || comment.includes("ngaret") || comment.includes("waktu")) {
+                            hasPunctualityIssue = true;
+                        }
+                        if (comment.includes("mahal") || comment.includes("harga") || comment.includes("biaya") || comment.includes("budget")) {
+                            hasPriceIssue = true;
+                        }
+                        if (comment.includes("balas") || comment.includes("chat") || comment.includes("admin") || comment.includes("respon") || comment.includes("ramah")) {
+                            hasCommIssue = true;
+                        }
+                    });
+
+                    if (hasFoodIssue) {
+                        suggestionsList.push("🍲 Masukan rasa/katering terdeteksi: Pastikan temperatur penyajian makanan tetap optimal dan lakukan food testing secara berkala.");
+                    }
+                    if (hasPunctualityIssue) {
+                        suggestionsList.push("🕒 Masukan ketepatan waktu terdeteksi: Tingkatkan kedisiplinan koordinasi tim lapangan agar selalu standby minimal 1 jam sebelum event.");
+                    }
+                    if (hasPriceIssue) {
+                        suggestionsList.push("💰 Masukan harga terdeteksi: Tinjau kembali skema bundling paket Anda agar rasio benefit dan harga lebih optimal bagi pelanggan.");
+                    }
+                    if (hasCommIssue) {
+                        suggestionsList.push("💬 Masukan komunikasi terdeteksi: Optimalkan waktu respons admin chat dan pastikan komunikasi terjalin secara ramah dan solutif.");
+                    }
+                } else {
+                    suggestionsList.push("Belum ada ulasan masuk. Selesaikan booking aktif Anda lalu ajak klien untuk memberikan ulasan ulasan positif.");
+                    suggestionsList.push("Tambahkan portofolio menarik di halaman layanan Anda untuk meyakinkan calon pelanggan baru.");
+                }
+
+                suggestionsList.forEach(s => {
+                    suggestionsContainer.innerHTML += `<li>${s}</li>`;
+                });
+
+                // 9. Generate Monthly Chart (Booking count in last 6 months)
+                const monthNamesFull = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'];
+                const last6MonthsList = [];
+                const currentDate = new Date();
+                
+                for (let i = 5; i >= 0; i--) {
+                    const d = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+                    last6MonthsList.push({
+                        label: monthNamesFull[d.getMonth()] + ' ' + String(d.getFullYear()).substring(2),
+                        monthNum: d.getMonth(),
+                        year: d.getFullYear(),
+                        count: 0
+                    });
+                }
+
+                vendorBookings.forEach(b => {
+                    if (b.status === 'confirmed' || b.status === 'completed') {
+                        const eventDate = new Date(b.tanggal_event);
+                        if (!isNaN(eventDate)) {
+                            const m = eventDate.getMonth();
+                            const y = eventDate.getFullYear();
+                            const match = last6MonthsList.find(lm => lm.monthNum === m && lm.year === y);
+                            if (match) {
+                                match.count++;
+                            }
+                        }
+                    }
+                });
+
+                const chartLabels = last6MonthsList.map(lm => lm.label);
+                const chartData = last6MonthsList.map(lm => lm.count);
+
+                const ctxVendor = document.getElementById('vendorTrendChart').getContext('2d');
+                new Chart(ctxVendor, {
+                    type: 'bar',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [{
+                            data: chartData,
+                            backgroundColor: function(context) {
+                                const idx = context.dataIndex;
+                                return (idx === 5) ? '#7c2d12' : '#cbd5e1'; // Highlight bulan ini
+                            },
+                            borderRadius: 4
+                        }]
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: {
+                                ticks: {
+                                    stepSize: 1,
+                                    precision: 0
+                                }
+                            }
+                        }
+                    }
+                });
+
+            } catch(error) {
+                console.error("Gagal inisialisasi analytics:", error);
+            }
+        });
+    </script>
+</body>
+</html>

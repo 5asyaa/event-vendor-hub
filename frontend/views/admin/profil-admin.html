@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Admin - EventVendorHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-[#f8f9fc] text-slate-800 min-h-screen flex">
+
+<!-- SIDEBAR -->
+<aside class="w-64 bg-[#0a1120] text-gray-400 p-6 flex flex-col justify-between hidden md:flex min-h-screen sticky top-0">
+    <div class="space-y-8">
+        <div><span class="block font-bold text-lg text-white tracking-tight">EventVendorHub</span><span class="text-[10px] uppercase tracking-wider text-gray-500 block mt-0.5">Admin Portal</span></div>
+        <nav class="space-y-1 text-sm font-medium">
+            <a href="dashboard-admin.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+            <a href="verifikasi-vendor.html" class="flex items-center justify-between px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition">
+                <span class="flex items-center gap-3"><i class="fa-regular fa-id-card"></i> Verifikasi Vendor</span>
+            </a>
+            <a href="kelola-user.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-users"></i> Kelola User</a>
+            <a href="pesanan-masuk.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-wallet"></i> Pesanan Masuk</a>
+            <a href="laporan-platform.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-chart-line"></i> Laporan</a>
+            <a href="profil-admin.html" class="flex items-center gap-3 bg-orange-500 text-white px-4 py-3 rounded-xl shadow-md font-semibold"><i class="fa-solid fa-user"></i> Profil Saya</a>
+        </nav>
+    </div>
+    <div class="space-y-3">
+        <a href="#" onclick="doLogout()" class="flex items-center gap-3 px-4 py-2 text-sm hover:text-red-400 hover:bg-slate-900/50 rounded-lg transition"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+    </div>
+</aside>
+
+<main class="flex-1 p-6 md:p-10 max-w-3xl mx-auto w-full space-y-6">
+
+    <div class="flex items-center gap-3 mb-2">
+        <a href="dashboard-admin.html" class="text-gray-400 hover:text-slate-700 transition"><i class="fa-solid fa-arrow-left"></i></a>
+        <h1 class="text-2xl font-extrabold text-slate-900">Profil Admin</h1>
+    </div>
+
+    <!-- Avatar & info singkat -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex items-center gap-5">
+        <div id="avatar-circle" class="w-16 h-16 rounded-full bg-orange-500 text-white font-black text-2xl flex items-center justify-center flex-shrink-0">AU</div>
+        <div>
+            <h2 id="display-name" class="text-xl font-bold text-slate-900">Memuat...</h2>
+            <p class="text-xs font-bold text-purple-600 uppercase mt-0.5">Super Admin</p>
+            <p id="display-email" class="text-xs text-gray-400 mt-1">—</p>
+        </div>
+        <div class="ml-auto">
+            <span class="bg-purple-50 text-purple-700 border border-purple-100 text-xs font-bold px-3 py-1.5 rounded-full">Admin</span>
+        </div>
+    </div>
+
+    <!-- Info Akun -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+        <h3 class="font-bold text-slate-900 flex items-center gap-2"><i class="fa-regular fa-user text-orange-500"></i> Informasi Akun</h3>
+
+        <div id="msg-banner" class="hidden"></div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-xs font-bold text-gray-600 mb-1">Nama Lengkap</label>
+                <input id="field-nama" type="text" placeholder="Nama admin"
+                    class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-600 mb-1">Email</label>
+                <input id="field-email" type="email" disabled
+                    class="w-full bg-gray-100 border border-gray-200 rounded-xl py-2.5 px-3 text-sm text-gray-400 cursor-not-allowed">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-600 mb-1">No. HP</label>
+                <input id="field-hp" type="text" placeholder="+62 812..."
+                    class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-600 mb-1">Role</label>
+                <input type="text" value="Admin" disabled
+                    class="w-full bg-gray-100 border border-gray-200 rounded-xl py-2.5 px-3 text-sm text-gray-400 cursor-not-allowed">
+            </div>
+        </div>
+    </div>
+
+    <!-- Ganti Password -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+        <h3 class="font-bold text-slate-900 flex items-center gap-2"><i class="fa-solid fa-lock text-orange-500"></i> Ganti Password</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-xs font-bold text-gray-600 mb-1">Password Baru</label>
+                <input id="field-newpass" type="password" placeholder="Minimal 6 karakter"
+                    class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-600 mb-1">Konfirmasi Password Baru</label>
+                <input id="field-confirmpass" type="password" placeholder="Ulangi password"
+                    class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+            </div>
+        </div>
+    </div>
+
+    <div class="flex gap-3">
+        <button id="save-btn" class="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl text-sm transition shadow-sm">
+            Simpan Perubahan
+        </button>
+        <a href="dashboard-admin.html" class="px-6 py-3 border border-slate-200 text-slate-600 font-semibold rounded-xl text-sm hover:bg-slate-50 transition text-center">
+            Kembali
+        </a>
+    </div>
+
+</main>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-6 right-6 z-50 hidden">
+    <div id="toast-inner" class="flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg text-sm font-semibold text-white">
+        <i id="toast-icon"></i><span id="toast-text"></span>
+    </div>
+</div>
+
+<script>
+const API = 'http://localhost:3000';
+
+function doLogout() { localStorage.removeItem('session'); window.location.href = '../public/login.html'; }
+
+function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    document.getElementById('toast-inner').style.background = type === 'success' ? '#16a34a' : '#dc2626';
+    document.getElementById('toast-icon').className = type === 'success' ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-exclamation';
+    document.getElementById('toast-text').textContent = msg;
+    t.classList.remove('hidden');
+    setTimeout(() => t.classList.add('hidden'), 3000);
+}
+
+document.addEventListener('DOMContentLoaded', async function() {
+    const session = JSON.parse(localStorage.getItem('session') || '{}');
+    if (!session.isLoggedIn || session.role !== 'admin') {
+        window.location.href = '../public/login.html'; return;
+    }
+
+    try {
+        const res = await fetch(`${API}/auth/users/${session.id}`);
+        if (res.ok) {
+            const user = await res.json();
+            const initials = (user.nama || 'AU').substring(0, 2).toUpperCase();
+            document.getElementById('avatar-circle').textContent = initials;
+            document.getElementById('display-name').textContent  = user.nama  || '—';
+            document.getElementById('display-email').textContent = user.email || '—';
+            document.getElementById('field-nama').value  = user.nama  || '';
+            document.getElementById('field-email').value = user.email || '';
+            document.getElementById('field-hp').value    = user.no_hp || '';
+        }
+    } catch(e) {
+        showToast('Gagal memuat data profil.', 'error');
+    }
+
+    document.getElementById('save-btn').addEventListener('click', async function() {
+        const newpass  = document.getElementById('field-newpass').value;
+        const confpass = document.getElementById('field-confirmpass').value;
+
+        if (newpass && newpass !== confpass) {
+            showToast('Password baru tidak cocok!', 'error');
+            return;
+        }
+        if (newpass && newpass.length < 6) {
+            showToast('Password minimal 6 karakter!', 'error');
+            return;
+        }
+
+        this.disabled = true;
+        this.textContent = 'Menyimpan...';
+
+        const nama  = document.getElementById('field-nama').value.trim();
+        const no_hp = document.getElementById('field-hp').value.trim();
+
+        const body = { nama, no_hp };
+        if (newpass) body.password = newpass;
+
+        try {
+            const res = await fetch(`${API}/auth/users/${session.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.message || 'Gagal menyimpan perubahan');
+            }
+
+            // Refresh data dari backend
+            const updated = await fetch(`${API}/auth/users/${session.id}`).then(r => r.json());
+            document.getElementById('display-name').textContent  = updated.nama  || nama;
+            document.getElementById('display-email').textContent = updated.email || '';
+            document.getElementById('field-nama').value  = updated.nama  || '';
+            document.getElementById('field-hp').value    = updated.no_hp || '';
+            document.getElementById('avatar-circle').textContent = (updated.nama || nama).substring(0, 2).toUpperCase();
+
+            // Update session lokal
+            const updatedSession = { ...session, nama: updated.nama || nama };
+            localStorage.setItem('session', JSON.stringify(updatedSession));
+
+            // Reset field password
+            document.getElementById('field-newpass').value    = '';
+            document.getElementById('field-confirmpass').value = '';
+
+            showToast('Profil berhasil diperbarui!', 'success');
+        } catch(e) {
+            showToast(e.message || 'Gagal menyimpan perubahan.', 'error');
+        } finally {
+            this.disabled = false;
+            this.textContent = 'Simpan Perubahan';
+        }
+    });
+});
+</script>
+</body>
+</html>

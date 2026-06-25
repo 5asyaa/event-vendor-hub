@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesanan Saya - EventVendorHub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            orange: '#F27024', orangeHover: '#D95D1A',
+                            darkBlue: '#0F172A', lightBg: '#F8FAFC',
+                            primaryText: '#1E293B', lightBorder: '#E2E8F0',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .btn-transition { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-hover:hover { transform: translateY(-3px); box-shadow: 0 10px 24px -8px rgba(0,0,0,0.12); }
+    </style>
+</head>
+<body class="bg-[#F9FAFB] text-brand-primaryText font-sans min-h-screen flex flex-col">
+
+    <header class="bg-white border-b border-slate-100 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="../public/index.html" class="flex items-center space-x-2 group">
+                <div class="bg-brand-orange p-2 rounded-xl text-white group-hover:scale-105 transition-transform duration-200">
+                    <i class="fa-regular fa-calendar-days text-xl text-white"></i>
+                </div>
+                <span class="text-xl font-bold tracking-tight text-brand-darkBlue">EventVendor<span class="text-brand-orange">Hub</span></span>
+            </a>
+            <nav class="hidden md:flex items-center space-x-8 relative">
+                <a href="pencarian-vendor.html" class="text-sm font-semibold text-slate-500 hover:text-brand-darkBlue transition-colors py-2">Temukan Vendor</a>
+                <a href="pesanan-saya.html" class="text-sm font-semibold text-brand-orange relative py-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-brand-orange">Pesanan Saya</a>
+            </nav>
+            <div id="auth-container" class="flex items-center space-x-4">
+                <a href="../public/login.html" class="text-sm font-semibold text-slate-600 hover:text-brand-darkBlue transition-colors">Login</a>
+                <a href="../public/register.html" class="text-sm font-semibold text-white bg-brand-darkBlue px-6 py-2.5 rounded-lg hover:bg-slate-800 shadow-sm btn-transition">Register</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-10 flex-grow w-full">
+        <div class="mb-8 flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-brand-darkBlue">Pesanan Saya</h1>
+                <p class="text-slate-500 text-sm mt-1">Pantau status pemesanan dan selesaikan pembayaran Anda di sini.</p>
+            </div>
+            <button onclick="loadMyBookings()" class="flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-brand-orange transition-colors border border-slate-200 bg-white px-4 py-2 rounded-xl hover:border-brand-orange btn-transition">
+                <i class="fa-solid fa-rotate-right"></i> Refresh
+            </button>
+        </div>
+
+        <!-- Alur Status -->
+        <div class="bg-white border border-brand-lightBorder rounded-2xl p-5 mb-8 flex flex-col md:flex-row gap-4 items-start md:items-center">
+            <div class="flex items-center gap-3 flex-1">
+                <div class="w-8 h-8 bg-orange-100 text-brand-orange rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
+                <div><span class="text-xs font-bold text-slate-900 block">Buat Pesanan</span><span class="text-[10px] text-slate-400">Isi detail acara Anda</span></div>
+            </div>
+            <i class="fa-solid fa-arrow-right text-slate-300 hidden md:block"></i>
+            <div class="flex items-center gap-3 flex-1">
+                <div class="w-8 h-8 bg-orange-100 text-brand-orange rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">2</div>
+                <div><span class="text-xs font-bold text-slate-900 block">Tunggu Konfirmasi Vendor</span><span class="text-[10px] text-slate-400">Vendor akan menerima/menolak</span></div>
+            </div>
+            <i class="fa-solid fa-arrow-right text-slate-300 hidden md:block"></i>
+            <div class="flex items-center gap-3 flex-1">
+                <div class="w-8 h-8 bg-orange-100 text-brand-orange rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">3</div>
+                <div><span class="text-xs font-bold text-slate-900 block">Lakukan Pembayaran</span><span class="text-[10px] text-slate-400">Bayar setelah vendor menyetujui</span></div>
+            </div>
+            <i class="fa-solid fa-arrow-right text-slate-300 hidden md:block"></i>
+            <div class="flex items-center gap-3 flex-1">
+                <div class="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"><i class="fa-solid fa-check"></i></div>
+                <div><span class="text-xs font-bold text-slate-900 block">Selesai & Beri Ulasan</span><span class="text-[10px] text-slate-400">Bagikan pengalaman Anda</span></div>
+            </div>
+        </div>
+
+        <!-- Info bar + filter -->
+        <div id="pagination-info-bar" class="hidden flex flex-wrap items-center justify-between gap-3 mb-4">
+            <span id="pagination-info" class="text-xs text-slate-400 font-medium"></span>
+            <div class="flex items-center gap-2">
+                <label class="text-xs text-slate-400 font-medium">Filter:</label>
+                <select id="status-filter" onchange="applyFilter()" class="text-xs border border-slate-200 rounded-lg px-3 py-1.5 bg-white text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-brand-orange">
+                    <option value="all">Semua Status</option>
+                    <option value="pending">Menunggu Konfirmasi</option>
+                    <option value="confirmed">Diterima Vendor</option>
+                    <option value="rejected">Ditolak</option>
+                    <option value="completed">Selesai</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="bookings-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="col-span-full flex items-center justify-center py-16">
+                <div class="flex flex-col items-center gap-3 text-slate-400">
+                    <div class="w-10 h-10 border-4 border-brand-orange border-t-transparent rounded-full animate-spin"></div>
+                    <span class="text-sm font-medium">Memuat pesanan...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div id="pagination-controls" class="hidden flex items-center justify-center gap-2 py-6">
+            <button id="btn-prev" onclick="changePage(-1)"
+                class="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-orange-50 hover:border-brand-orange hover:text-brand-orange transition disabled:opacity-30 disabled:cursor-not-allowed">
+                <i class="fa-solid fa-chevron-left"></i> Sebelumnya
+            </button>
+            <div id="page-numbers" class="flex items-center gap-1"></div>
+            <button id="btn-next" onclick="changePage(1)"
+                class="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-orange-50 hover:border-brand-orange hover:text-brand-orange transition disabled:opacity-30 disabled:cursor-not-allowed">
+                Berikutnya <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+    </main>
+
+    <footer class="bg-[#0B1221] text-white py-12 px-6 border-t border-slate-800 mt-auto">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="space-y-2 text-center md:text-left">
+                <a href="../public/index.html" class="flex items-center justify-center md:justify-start space-x-2">
+                    <div class="bg-brand-orange p-1.5 rounded-lg text-white">
+                        <i class="fa-regular fa-calendar-days text-sm text-white"></i>
+                    </div>
+                    <span class="text-lg font-bold tracking-tight text-white">EventVendor<span class="text-brand-orange">Hub</span></span>
+                </a>
+                <p class="text-sm text-slate-400">© 2024 EventVendorHub. Indonesian Hospitality, Global Standards.</p>
+            </div>
+            <div class="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-300">
+                <a href="#" class="hover:text-brand-orange transition-colors">About Us</a>
+                <a href="#" class="hover:text-brand-orange transition-colors">Terms of Service</a>
+                <a href="#" class="hover:text-brand-orange transition-colors">Privacy Policy</a>
+                <a href="#" class="hover:text-brand-orange transition-colors">Contact Support</a>
+                <a href="#" class="hover:text-brand-orange transition-colors">Vendor FAQ</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ── Config ────────────────────────────────────────
+        const PAGE_SIZE = 6;
+
+        // ── State ─────────────────────────────────────────
+        let allMyBookings  = [];   // semua pesanan user (sudah include service/vendor/review data)
+        let filteredList   = [];
+        let currentPage    = 1;
+        let _allServices   = [];
+        let _allVendors    = [];
+        let _allReviews    = [];
+        let _session       = {};
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // Auth UI
+            const authContainer = document.getElementById('auth-container');
+            const sessionStr    = localStorage.getItem('session');
+            if (sessionStr && authContainer) {
+                try {
+                    const session = JSON.parse(sessionStr);
+                    if (session && (session.token || session.isLoggedIn)) {
+                        const userName = session.nama || 'Customer';
+                        authContainer.innerHTML = `
+                            <div class="flex items-center space-x-4">
+                                <a href="profil.html" class="text-sm font-semibold text-slate-700 hover:text-brand-orange transition flex items-center gap-1.5">
+                                    <i class="fa-regular fa-user mr-1" style="color:#F27024"></i> Hai, ${userName}
+                                </a>
+                                <button onclick="handleLogout()" class="text-sm font-semibold text-red-500 hover:text-red-700 transition-colors flex items-center gap-1.5">
+                                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                                </button>
+                            </div>`;
+                    }
+                } catch(e) {}
+            }
+
+            loadMyBookings();
+        });
+
+        function handleLogout() {
+            localStorage.removeItem('session');
+            localStorage.removeItem('activeCheckout');
+            localStorage.removeItem('id_booking');
+            window.location.href = '../public/login.html';
+        }
+
+        async function loadMyBookings() {
+            const container = document.getElementById("bookings-container");
+            document.getElementById("pagination-controls").classList.add("hidden");
+            document.getElementById("pagination-info-bar").classList.add("hidden");
+
+            container.innerHTML = `
+                <div class="col-span-full flex items-center justify-center py-16">
+                    <div class="flex flex-col items-center gap-3 text-slate-400">
+                        <div class="w-10 h-10 border-4 border-brand-orange border-t-transparent rounded-full animate-spin"></div>
+                        <span class="text-sm font-medium">Memuat pesanan...</span>
+                    </div>
+                </div>`;
+
+            try {
+                _session      = JSON.parse(localStorage.getItem('session') || '{}');
+                const token   = _session.token || '';
+
+                const response = await fetch("http://localhost:3000/bookings", {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error("Gagal mengambil data");
+                const bookings = await response.json();
+
+                const myBookings = (_session.id)
+                    ? bookings.filter(b => Number(b.id_user) === Number(_session.id))
+                    : bookings;
+
+                myBookings.sort((a, b) => b.id_booking - a.id_booking);
+
+                if (myBookings.length === 0) {
+                    container.innerHTML = `
+                        <div class="col-span-full flex flex-col items-center justify-center py-20 text-slate-400">
+                            <i class="fa-regular fa-calendar-xmark text-5xl mb-4 text-slate-300"></i>
+                            <h3 class="text-base font-bold text-slate-600 mb-1">Belum ada pesanan</h3>
+                            <p class="text-sm text-slate-400 mb-6">Temukan vendor terbaik untuk acara Anda</p>
+                            <a href="pencarian-vendor.html" class="bg-[#F27024] hover:bg-[#D95D1A] text-white font-bold px-6 py-2.5 rounded-xl text-sm">
+                                Temukan Vendor
+                            </a>
+                        </div>`;
+                    return;
+                }
+
+                // Ambil semua data services, vendors & reviews sekali saja
+                try {
+                    [_allServices, _allVendors, _allReviews] = await Promise.all([
+                        fetch("http://localhost:3000/services").then(r => r.json()),
+                        fetch("http://localhost:3000/vendors").then(r => r.json()),
+                        fetch("http://localhost:3000/reviews").then(r => r.json())
+                    ]);
+                } catch(e) { console.error("Gagal load services/vendors/reviews:", e); }
+
+                allMyBookings = myBookings;
+
+                // Reset filter & render
+                document.getElementById('status-filter').value = 'all';
+                currentPage = 1;
+                applyFilter();
+
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center py-20">
+                        <i class="fa-solid fa-triangle-exclamation text-4xl mb-3 text-red-300"></i>
+                        <p class="text-sm font-medium text-red-500">Gagal memuat pesanan. Pastikan server berjalan.</p>
+                    </div>`;
+            }
+        }
+
+        // ── Filter ────────────────────────────────────────
+        function applyFilter() {
+            const filter = document.getElementById('status-filter').value;
+            filteredList = filter === 'all'
+                ? [...allMyBookings]
+                : allMyBookings.filter(b => b.status === filter);
+            currentPage = 1;
+            renderPage();
+        }
+
+        // ── Render halaman aktif ──────────────────────────
+        async function renderPage() {
+            const container  = document.getElementById("bookings-container");
+            const totalPages = Math.ceil(filteredList.length / PAGE_SIZE);
+            const start      = (currentPage - 1) * PAGE_SIZE;
+            const pageItems  = filteredList.slice(start, start + PAGE_SIZE);
+
+            container.innerHTML = "";
+
+            if (filteredList.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center py-20 text-slate-400">
+                        <i class="fa-regular fa-calendar-xmark text-5xl mb-4 text-slate-300"></i>
+                        <h3 class="text-base font-bold text-slate-600 mb-1">Tidak ada pesanan untuk filter ini</h3>
+                    </div>`;
+                document.getElementById("pagination-controls").classList.add("hidden");
+                // Tetap tampilkan info bar agar dropdown filter tidak hilang
+                const infoBar = document.getElementById("pagination-info-bar");
+                document.getElementById("pagination-info").textContent = `0 pesanan`;
+                infoBar.classList.remove("hidden");
+                return;
+            }
+
+            // Loading spinner saat render
+            container.innerHTML = `
+                <div class="col-span-full flex items-center justify-center py-16">
+                    <div class="flex flex-col items-center gap-3 text-slate-400">
+                        <div class="w-10 h-10 border-4 border-brand-orange border-t-transparent rounded-full animate-spin"></div>
+                        <span class="text-sm font-medium">Memuat halaman...</span>
+                    </div>
+                </div>`;
+
+            // Build semua kartu halaman ini (async, termasuk fetch payment per kartu)
+            const cards = await Promise.all(
+                pageItems.map(b => buildBookingCard(b, _allServices, _allVendors, _allReviews, _session).catch(err => {
+                    console.error("ERROR BOOKING", b.id_booking, err);
+                    return null;
+                }))
+            );
+
+            container.innerHTML = "";
+            for (const card of cards) {
+                if (card) container.appendChild(card);
+            }
+
+            // Update info bar
+            const infoBar = document.getElementById("pagination-info-bar");
+            const infoEl  = document.getElementById("pagination-info");
+            infoBar.classList.remove("hidden");
+            infoEl.textContent = `Halaman ${currentPage} dari ${totalPages} · ${filteredList.length} pesanan`;
+
+            // Update pagination controls
+            const controls = document.getElementById("pagination-controls");
+            if (totalPages <= 1) {
+                controls.classList.add("hidden");
+                return;
+            }
+            controls.classList.remove("hidden");
+
+            document.getElementById("btn-prev").disabled = currentPage === 1;
+            document.getElementById("btn-next").disabled = currentPage === totalPages;
+
+            // Render nomor halaman (dengan ellipsis)
+            const pageNumbers = document.getElementById("page-numbers");
+            pageNumbers.innerHTML = "";
+            const pages = buildPageRange(currentPage, totalPages);
+            for (const p of pages) {
+                if (p === '…') {
+                    const el = document.createElement("span");
+                    el.className = "px-2 text-slate-400 text-xs select-none";
+                    el.textContent = "…";
+                    pageNumbers.appendChild(el);
+                } else {
+                    const btn = document.createElement("button");
+                    btn.textContent = p;
+                    btn.className = p === currentPage
+                        ? "w-8 h-8 rounded-lg text-xs font-bold bg-[#F27024] text-white"
+                        : "w-8 h-8 rounded-lg text-xs font-semibold border border-slate-200 bg-white text-slate-600 hover:bg-orange-50 hover:border-brand-orange hover:text-brand-orange transition";
+                    btn.onclick = () => { currentPage = p; renderPage(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+                    pageNumbers.appendChild(btn);
+                }
+            }
+        }
+
+        // Range halaman dengan ellipsis
+        function buildPageRange(cur, total) {
+            if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+            if (cur <= 4)   return [1, 2, 3, 4, 5, '…', total];
+            if (cur >= total - 3) return [1, '…', total-4, total-3, total-2, total-1, total];
+            return [1, '…', cur - 1, cur, cur + 1, '…', total];
+        }
+
+        // Prev / Next
+        function changePage(delta) {
+            const totalPages = Math.ceil(filteredList.length / PAGE_SIZE);
+            currentPage = Math.max(1, Math.min(totalPages, currentPage + delta));
+            renderPage();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function buildBookingCard(booking, allServices, allVendors, allReviews, session) {
+            const statusConfig = {
+                "pending":   { color: "background:#fffbeb;color:#b45309;border:1px solid #fde68a",   icon: "fa-clock",         label: "Menunggu Konfirmasi" },
+                "confirmed": { color: "background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0",   icon: "fa-circle-check",  label: "Diterima Vendor" },
+                "rejected":  { color: "background:#fef2f2;color:#dc2626;border:1px solid #fecaca",   icon: "fa-circle-xmark",  label: "Ditolak Vendor" },
+                "completed": { color: "background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe",   icon: "fa-star",          label: "Selesai" },
+                "cancelled": { color: "background:#f8fafc;color:#64748b;border:1px solid #e2e8f0",   icon: "fa-ban",           label: "Dibatalkan" }
+            };
+            const sc = statusConfig[booking.status] || { color: "background:#f1f5f9;color:#475569;border:1px solid #e2e8f0", icon: "fa-question", label: booking.status || 'Unknown' };
+
+            let tanggalDisplay = booking.tanggal_event;
+            try { tanggalDisplay = new Date(booking.tanggal_event).toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' }); } catch(e) {}
+
+            // ── Ambil data payment dari backend ──────────────────────────────────
+            let dpPaidAmount     = 0;
+            let statusPembayaran = booking.status_pembayaran || "belum_bayar";
+            let totalHarga       = Number(booking.total_harga) || 0;
+
+            try {
+                const paymentRes = await fetch(`http://localhost:3000/payments/booking/${booking.id_booking}`, {
+                    headers: { 'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('session')||'{}').token||'')}` }
+                });
+                if (paymentRes.ok) {
+                    const paymentData = await paymentRes.json();
+                    dpPaidAmount = Number(paymentData.total_dibayar) || 0;
+                    if (paymentData.status_pembayaran) {
+                        statusPembayaran = paymentData.status_pembayaran;
+                    }
+                }
+            } catch(err) { console.error(err); }
+
+            // ── Cari vendor untuk link ulasan ────────────────────────────────────
+            const service    = allServices.find(s => Number(s.id_service) === Number(booking.id_service));
+            const vendor     = service ? allVendors.find(v => Number(v.id_vendor) === Number(service.id_vendor)) : null;
+            const idVendor   = vendor ? vendor.id_vendor : '';
+            const vendorName = vendor ? vendor.nama_usaha : 'Vendor';
+
+            // ── Cek apakah sudah pernah beri ulasan untuk booking ini ────────────
+            const sudahUlasan = allReviews.some(
+                r => Number(r.id_booking) === Number(booking.id_booking) &&
+                     Number(r.id_user)    === Number(session.id || 0)
+            );
+
+            // ── Bangun action HTML ───────────────────────────────────────────────
+            let actionHtml = '';
+
+            if (booking.status === 'confirmed') {
+                if (statusPembayaran === "belum_bayar") {
+                    actionHtml = `
+                        <a href="pembayaran.html?id_booking=${booking.id_booking}"
+                           style="display:block;width:100%;text-align:center;background:#F27024;color:#fff;font-weight:700;padding:10px;border-radius:12px;font-size:12px;text-decoration:none;">
+                            Bayar DP Sekarang →
+                        </a>`;
+
+                } else if (statusPembayaran === "dp") {
+                    const sisaPelunasan = totalHarga - dpPaidAmount;
+                    actionHtml = `
+                        <div style="padding-top:12px;border-top:1px solid #f1f5f9;">
+                            <div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-bottom:8px;">
+                                <span>DP Dibayar</span><span style="font-weight:700;">Rp ${dpPaidAmount.toLocaleString('id-ID')}</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-bottom:12px;">
+                                <span>Sisa Pelunasan</span><span style="font-weight:700;">Rp ${sisaPelunasan.toLocaleString('id-ID')}</span>
+                            </div>
+                            <a href="pembayaran.html?id_booking=${booking.id_booking}&type=pelunasan&amount=${sisaPelunasan}"
+                               style="display:block;width:100%;text-align:center;background:#1e293b;color:#fff;font-weight:700;padding:10px;border-radius:12px;font-size:12px;text-decoration:none;">
+                                Bayar Sisa Pelunasan →
+                            </a>
+                        </div>`;
+
+                } else if (statusPembayaran === "lunas") {
+                    // Lunas → tampilkan badge lunas + tombol Beri Ulasan (jika belum)
+                    const reviewBtnHtml = (!sudahUlasan && idVendor)
+                        ? `<a href="beri-ulasan.html?id_booking=${booking.id_booking}&id_vendor=${idVendor}&vendor_name=${encodeURIComponent(vendorName)}"
+                               style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:#0f172a;color:#fff;font-weight:700;border-radius:12px;font-size:12px;text-decoration:none;margin-top:8px;">
+                                <i class="fa-solid fa-star" style="color:#fbbf24;"></i> Beri Ulasan
+                            </a>`
+                        : (sudahUlasan
+                            ? `<div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;font-size:12px;font-weight:700;color:#16a34a;margin-top:8px;">
+                                    <i class="fa-solid fa-circle-check"></i> Ulasan Sudah Dikirim
+                               </div>`
+                            : '');
+
+                    actionHtml = `
+                        <div>
+                            <div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;font-size:12px;font-weight:700;color:#16a34a;">
+                                <i class="fa-solid fa-circle-check"></i> Pembayaran Lunas Sepenuhnya
+                            </div>
+                            ${reviewBtnHtml}
+                        </div>`;
+                }
+
+            } else if (booking.status === 'pending') {
+                actionHtml = `
+                    <div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;background:#fffbeb;border:1px solid #fde68a;border-radius:12px;font-size:12px;color:#b45309;">
+                        <i class="fa-solid fa-clock"></i> Menunggu konfirmasi vendor...
+                    </div>`;
+
+            } else if (booking.status === 'rejected') {
+                actionHtml = `
+                    <div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;background:#fef2f2;border:1px solid #fecaca;border-radius:12px;font-size:12px;color:#dc2626;">
+                        <i class="fa-solid fa-ban"></i> Pesanan ditolak oleh vendor
+                    </div>`;
+            }
+
+            // ── Build card element ───────────────────────────────────────────────
+            const card = document.createElement("div");
+            card.className = "bg-white rounded-2xl border border-brand-lightBorder shadow-sm overflow-hidden flex flex-col card-hover transition-all duration-300";
+            card.innerHTML = `
+                <div style="position:relative;height:140px;background:#e2e8f0;overflow:hidden;">
+                    <img src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=500"
+                         style="width:100%;height:100%;object-fit:cover;opacity:0.8;">
+                    <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(15,23,42,0.65), transparent);"></div>
+                    <span style="position:absolute;top:12px;right:12px;${sc.color};font-size:10px;font-weight:700;padding:4px 10px;border-radius:999px;display:flex;align-items:center;gap:4px;">
+                        <i class="fa-solid ${sc.icon}" style="font-size:9px;"></i> ${sc.label}
+                    </span>
+                    <span style="position:absolute;bottom:12px;left:12px;color:#fff;font-size:12px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,0.4);">#EVH-${booking.id_booking}</span>
+                </div>
+                <div style="padding:20px;display:flex;flex-direction:column;flex-grow:1;gap:16px;">
+                    <div style="display:flex;flex-direction:column;gap:6px;flex-grow:1;">
+                        <div style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#64748b;">
+                            <i class="fa-regular fa-calendar" style="color:#F27024;margin-top:2px;width:12px;flex-shrink:0;"></i>
+                            <span>${tanggalDisplay}</span>
+                        </div>
+                        <div style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#64748b;">
+                            <i class="fa-solid fa-location-dot" style="color:#F27024;margin-top:2px;width:12px;flex-shrink:0;"></i>
+                            <span>${booking.lokasi || '-'}</span>
+                        </div>
+                        ${vendorName !== 'Vendor' ? `
+                        <div style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#64748b;">
+                            <i class="fa-solid fa-store" style="color:#F27024;margin-top:2px;width:12px;flex-shrink:0;"></i>
+                            <span>${vendorName}</span>
+                        </div>` : ''}
+                        ${booking.catatan ? `
+                        <div style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#64748b;">
+                            <i class="fa-regular fa-note-sticky" style="color:#F27024;margin-top:2px;width:12px;flex-shrink:0;"></i>
+                            <span style="overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${booking.catatan}</span>
+                        </div>` : ''}
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid #f1f5f9;">
+                        <span style="font-size:12px;color:#94a3b8;">Total Harga</span>
+                        <span style="font-weight:800;color:#F27024;font-size:14px;">Rp ${Number(booking.total_harga).toLocaleString('id-ID')}</span>
+                    </div>
+                    ${actionHtml}
+                </div>`;
+
+            return card;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alur Pemesanan - EventVendorHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            orange: '#F27024',
+                            darkBlue: '#0F172A',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 text-slate-900 font-sans min-h-screen flex flex-col">
+    <!-- NAVBAR STANDAR -->
+    <header class="bg-white border-b border-slate-100 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="../public/index.html" class="flex items-center gap-2 group">
+                <div class="bg-[#F27024] p-2 rounded-xl text-white group-hover:scale-105 transition-transform">
+                    <i class="fa-regular fa-calendar-days text-lg text-white"></i>
+                </div>
+                <span class="text-lg font-bold text-[#0F172A]">EventVendor<span class="text-[#F27024]">Hub</span></span>
+            </a>
+            <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-500">
+                <a href="pencarian-vendor.html" class="hover:text-[#0F172A] transition">Temukan Vendor</a>
+                <a href="pesanan-saya.html" class="hover:text-[#0F172A] transition">Pesanan Saya</a>
+            </nav>
+            <div id="auth-container" class="flex items-center gap-3">
+                <a href="../public/login.html" class="text-sm font-semibold text-[#0F172A] px-4 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition">Login</a>
+                <a href="../public/register.html" class="text-sm font-semibold text-white bg-[#0F172A] px-4 py-2 rounded-lg hover:bg-slate-800 shadow-sm transition">Register</a>
+            </div>
+        </div>
+    </header>
+    
+    <div class="max-w-xl mx-auto my-6 px-4">
+        <div class="flex items-center justify-between relative">
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-0.5 bg-gray-200 -z-10"></div>
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1/2 h-0.5 bg-orange-500 -z-10"></div>
+            <div class="text-center bg-gray-50 px-2"><div class="w-7 h-7 rounded-full bg-orange-500 text-white font-bold flex items-center justify-center text-xs mx-auto shadow-sm">1</div><span class="text-[10px] font-bold text-orange-500 mt-1 block">Detail</span></div>
+            <div class="text-center bg-gray-50 px-2"><div class="w-7 h-7 rounded-full bg-gray-200 text-gray-400 font-bold flex items-center justify-center text-xs mx-auto">2</div><span class="text-[10px] font-medium text-gray-400 mt-1 block">Pembayaran</span></div>
+            <div class="text-center bg-gray-50 px-2"><div class="w-7 h-7 rounded-full bg-gray-200 text-gray-400 font-bold flex items-center justify-center text-xs mx-auto">3</div><span class="text-[10px] font-medium text-gray-400 mt-1 block">Sukses</span></div>
+        </div>
+    </div>
+
+    <main class="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex gap-4 items-center">
+                <div class="w-16 h-16 bg-gray-100 rounded-xl overflow-hidden"><img src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=150" class="w-full h-full object-cover"></div>
+                <div>
+                    <h2 class="font-bold text-slate-900" id="display-vendor-name">Lumina Wedding Photography</h2>
+                    <span class="bg-slate-900 text-blue-300 text-[10px] font-bold px-2 py-0.5 rounded mt-1 inline-block" id="display-package-name">Premium Gold (Full Day)</span>
+                </div>
+            </div>
+
+            <form id="order-details-form" class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Tanggal Acara</label>
+                        <input type="date" id="tanggal_event" required class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-xs focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Waktu Mulai</label>
+                        <input type="text" id="waktu_mulai" required placeholder="--:-- --" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-xs focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Lokasi Tempat</label>
+                    <input type="text" id="lokasi" required placeholder="e.g., Grand Ballroom, Hotel Mulia" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-xs focus:outline-none focus:ring-2 focus:ring-orange-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Nomor Telepon Kontak (WhatsApp)</label>
+                    <input type="text" id="no_telepon" required placeholder="+62 812..." class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-xs focus:outline-none focus:ring-2 focus:ring-orange-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Catatan</label>
+                    <textarea id="catatan" rows="3" placeholder="Tambahkan catatan detail acara..." class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-xs focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
+                </div>
+                <button type="submit" class="w-full lg:hidden bg-orange-500 text-white font-bold py-3 rounded-xl text-sm shadow-md hover:bg-orange-600 transition">Selesaikan Pemesanan &rarr;</button>
+            </form>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm space-y-4 h-fit">
+            <h3 class="font-bold text-slate-900 border-b border-gray-50 pb-2">Ringkasan Pesanan</h3>
+            <div class="text-xs space-y-2 text-gray-500">
+                <div class="flex justify-between"><span>Jumlah Paket</span><span class="font-bold text-slate-900" id="calc-package-price">Rp 15.000.000</span></div>
+                <div class="flex justify-between"><span>Biaya Layanan</span><span class="font-bold text-slate-900">Rp 50.000</span></div>
+                <div class="flex justify-between text-sm font-bold text-slate-900 border-t border-gray-50 pt-2"><span>Jumlah Keseluruhan</span><span id="calc-total-price">Rp 15.050.000</span></div>
+            </div>
+            <div class="bg-blue-50 border border-blue-100 p-4 rounded-xl">
+                <span class="text-xs font-bold text-blue-900 block">Uang Muka yang Diperlukan (30%)</span>
+                <span class="text-2xl font-black text-blue-900 block my-1" id="calc-dp-price">Rp 4.515.000</span>
+                <span class="text-[10px] text-blue-700 block">Bayar jumlah ini sekarang untuk mengamankan pesanan Anda.</span>
+            </div>
+            <button id="btn-submit-desktop" class="hidden lg:block w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl text-xs shadow-md transition">Selesaikan Pemesanan &rarr;</button>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const checkoutData =
+                JSON.parse(
+                    localStorage.getItem(
+                        "activeCheckout"
+                    )
+                );
+
+            const currentVendorData = {
+                vendorName:
+                    checkoutData.nama_vendor,
+
+                packageName:
+                    checkoutData.nama_paket,
+
+                basePrice:
+                    Number(checkoutData.harga),
+
+                serviceFee: 50000
+            };
+            const totalHargaHitung = currentVendorData.basePrice + currentVendorData.serviceFee;
+            const dpRequired = Math.round(totalHargaHitung * 0.3);
+
+            // Render komponen kasir awal
+            document.getElementById('display-vendor-name').innerText = currentVendorData.vendorName;
+            document.getElementById('display-package-name').innerText = currentVendorData.packageName;
+            document.getElementById('calc-package-price').innerText = "Rp " + currentVendorData.basePrice.toLocaleString('id-ID');
+            document.getElementById('calc-total-price').innerText = "Rp " + totalHargaHitung.toLocaleString('id-ID');
+            document.getElementById('calc-dp-price').innerText = "Rp " + dpRequired.toLocaleString('id-ID');
+
+            const form = document.getElementById('order-details-form');
+            
+            async function prosesKePembayaran() {
+
+    // Ambil id_user dari session yang tersimpan saat login
+    let loggedInUserId = 1; // fallback default
+    let loggedInServiceId = 1; // fallback default
+    try {
+        const s = JSON.parse(localStorage.getItem('session') || '{}');
+        if (s.id) loggedInUserId = Number(s.id);
+        else if (s.id_user) loggedInUserId = Number(s.id_user);
+
+        // Ambil id_service dari localStorage jika tersedia (set saat pilih vendor)
+        const checkout = JSON.parse(localStorage.getItem('activeCheckout') || '{}');
+        if (checkout.id_service) loggedInServiceId = Number(checkout.id_service);
+    } catch(e) {}
+
+    const databasePayload = {
+        id_user: loggedInUserId,
+        id_service: loggedInServiceId,
+
+        tanggal_event:
+            document.getElementById('tanggal_event').value,
+
+        waktu_mulai:
+            document.getElementById('waktu_mulai').value,
+
+        lokasi:
+            document.getElementById('lokasi').value,
+
+        no_telepon:
+            document.getElementById('no_telepon').value,
+
+        catatan:
+            document.getElementById('catatan').value,
+
+        total_harga:
+            totalHargaHitung
+    };
+
+    if (
+        !databasePayload.tanggal_event ||
+        !databasePayload.waktu_mulai ||
+        !databasePayload.lokasi ||
+        !databasePayload.no_telepon
+    ) {
+        alert("Mohon isi semua kolom wajib!");
+        return;
+    }
+
+    try {
+        const s = JSON.parse(localStorage.getItem('session') || '{}');
+        const token = s.token || '';
+
+        const response = await fetch(
+            "http://localhost:3000/bookings",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify(databasePayload)
+            }
+        );
+
+        const result = await response.json();
+
+        console.log("Booking result:", result);
+
+        localStorage.setItem(
+            "id_booking",
+            result.id_booking
+        );
+
+        localStorage.setItem(
+            "activeCheckout",
+            JSON.stringify({
+                ...databasePayload,
+                id_booking: result.id_booking,
+                vendorName: currentVendorData.vendorName,
+                packageName: currentVendorData.packageName,
+                dpRequired: dpRequired
+            })
+        );
+
+        // Langsung arahkan ke pesanan saya tanpa alert
+        window.location.href = `pesanan-saya.html`;
+
+    } catch (error) {
+
+        console.error(error);
+        alert(
+            "Gagal membuat booking. Pastikan API Gateway dan Booking Service berjalan."
+        );
+
+    }
+
+}
+
+            // Handler tombol desktop
+            document.getElementById('btn-submit-desktop').addEventListener('click', function() {
+                if(form.reportValidity()) {
+                    prosesKePembayaran();
+                }
+            });
+
+            // Handler form submit
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                prosesKePembayaran();
+            });
+        });
+
+        // SINKRONISASI AUTHENTICATION UI
+        const authContainer = document.getElementById('auth-container');
+        let session = null;
+        try {
+            session = JSON.parse(localStorage.getItem('session'));
+        } catch(e) {}
+
+        if (session && session.nama) {
+            authContainer.innerHTML = `
+                <a href="profil.html" class="text-sm font-semibold text-slate-700 hover:text-brand-orange transition flex items-center gap-2">
+                    <i class="fa-regular fa-circle-user text-xl"></i>
+                    <span>Hai, ${session.nama.split(' ')[0]}</span>
+                </a>
+                <button onclick="logout()" class="text-sm font-semibold text-red-500 hover:text-red-700 transition flex items-center gap-1">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                </button>
+            `;
+        } else {
+            // Guard: jika tidak login, redirect
+            window.location.href = '../public/login.html';
+        }
+
+        function logout() {
+            localStorage.removeItem('session');
+            window.location.href = '../public/login.html';
+        }
+    </script>
+
+    <footer class="bg-[#0B1221] text-white py-12 px-6 border-t border-slate-800 mt-auto">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="space-y-2 text-center md:text-left">
+                <a href="../public/index.html" class="flex items-center justify-center md:justify-start space-x-2">
+                    <div class="bg-brand-orange p-1.5 rounded-lg text-white">
+                        <i class="fa-regular fa-calendar-days text-sm text-white"></i>
+                    </div>
+                    <span class="text-lg font-bold tracking-tight text-white">EventVendor<span class="text-brand-orange">Hub</span></span>
+                </a>
+                <p class="text-sm text-slate-400">© 2024 EventVendorHub. Indonesian Hospitality, Global Standards.</p>
+            </div>
+            <div class="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-300">
+                <a href="#" class="hover:text-brand-orange transition-colors">About Us</a>
+                <a href="#" class="hover:text-brand-orange transition-colors">Terms of Service</a>
+                <a href="#" class="hover:text-brand-orange transition-colors">Privacy Policy</a>
+                <a href="#" class="hover:text-brand-orange transition-colors">Contact Support</a>
+                <a href="#" class="hover:text-brand-orange transition-colors">Vendor FAQ</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Berhasil - EventVendorHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 text-slate-900 font-['Inter'] min-h-screen flex flex-col">
+    <main class="flex-grow flex items-center justify-center p-4">
+    <div class="w-full max-w-xl bg-white rounded-2xl shadow-md border-t-4 border-orange-500 p-8 text-center space-y-6">
+        <div class="w-12 h-12 bg-emerald-50 text-emerald-500 border border-emerald-100 rounded-full flex items-center justify-center text-xl mx-auto"><i class="fa-solid fa-check"></i></div>
+        <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight" id="status-title">Booking Berhasil!</h1>
+            <p class="text-xs text-gray-400 mt-1 max-w-sm mx-auto" id="status-desc">Sedang memuat informasi pemesanan Anda...</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-xl text-left text-xs space-y-3">
+            <div class="flex justify-between border-b border-gray-100 pb-2"><span class="text-gray-400 font-medium">Booking ID</span><span class="font-bold text-slate-900" id="booking-id">#EVH-xxxx</span></div>
+            <div class="grid grid-cols-2 gap-3">
+                <div><span class="text-gray-400 block text-[10px]">Vendor</span><span class="font-bold text-slate-900" id="vendor-name">-</span></div>
+                <div><span class="text-gray-400 block text-[10px]">Tanggal Acara</span><span class="font-bold text-slate-900" id="event-date">-</span></div>
+                <div><span class="text-gray-400 block text-[10px]">Paket</span><span class="font-bold text-slate-900" id="package-name">-</span></div>
+                <div><span id="payment-label"class="text-gray-400 block text-[10px]">Total Pembayaran</span><span class="font-bold text-orange-600" id="dp-paid">Rp 0</span></div>
+            </div>
+            <div class="flex justify-between border-t border-gray-100 pt-2"><span class="text-gray-400 font-medium">Status Pembayaran</span><span class="font-bold text-yellow-600" id="payment-status">Menunggu Pembayaran</span></div>
+        </div>
+        <div class="flex gap-3 pt-2">
+            <button class="flex-1 bg-emerald-500 text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm"><i class="fa-brands fa-whatsapp text-sm"></i> Hubungi via WhatsApp</button>
+            <button onclick="window.location.href='pesanan-saya.html'" class="bg-gray-100 text-slate-800 font-bold py-3 px-5 rounded-xl text-xs border border-gray-200">Lihat Pesanan Saya</button>
+        </div>
+        <a href="../index.html" class="text-[11px] font-bold text-gray-400 hover:text-slate-900 block pt-2">&larr; Kembali ke Beranda</a>
+    </div>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async function() {
+            const session = JSON.parse(localStorage.getItem('session') || '{}');
+            const token = session.token || '';
+
+            const urlParams = new URLSearchParams(window.location.search);
+            let id_booking = urlParams.get('id_booking');
+            if (!id_booking) {
+                id_booking = localStorage.getItem("id_booking");
+            }
+
+            if (!id_booking) {
+                document.getElementById('status-desc').innerText = "ID Booking tidak terdeteksi. Silakan periksa riwayat pesanan Anda.";
+                return;
+            }
+
+            document.getElementById('booking-id').innerText = "#EVH-BOOKING-" + id_booking;
+
+            // Load data dasar dari localStorage agar cepat terisi di UI
+            // Load data dasar dari localStorage agar cepat terisi di UI (fallback)
+            const activeCheckout =
+                JSON.parse(
+                    localStorage.getItem("activeCheckout") || "{}"
+                );
+
+            document.getElementById('vendor-name').innerText =
+                activeCheckout.vendorName || activeCheckout.nama_vendor || "-";
+
+            document.getElementById('package-name').innerText =
+                activeCheckout.packageName || activeCheckout.nama_paket || "-";
+
+            document.getElementById('event-date').innerText =
+                activeCheckout.tanggal_event || "-";
+
+            document.getElementById('dp-paid').innerText =
+                "Rp " +
+                Math.round(
+                    Number(activeCheckout.dpRequired || 0)
+                ).toLocaleString('id-ID');
+
+            // Ambil detail data secara dinamis dari database sesuai booking ID
+            if (id_booking) {
+                fetch(`http://localhost:3000/bookings/${id_booking}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                })
+                    .then(res => res.json())
+                    .then(bookingData => {
+                        if (bookingData && bookingData.id_service) {
+                            fetch(`http://localhost:3000/services`)
+                                .then(res => res.json())
+                                .then(services => {
+                                    const service = services.find(s => s.id_service == bookingData.id_service);
+                                    if (service) {
+                                        document.getElementById('package-name').innerText = service.nama_paket;
+                                        fetch(`http://localhost:3000/vendors/${service.id_vendor}`)
+                                            .then(res => res.json())
+                                            .then(vendor => {
+                                                if (vendor) {
+                                                    document.getElementById('vendor-name').innerText = vendor.nama_usaha;
+                                                }
+                                            }).catch(err => console.log("Gagal fetch vendor", err));
+                                    }
+                                }).catch(err => console.log("Gagal fetch services", err));
+                        }
+                    }).catch(err => console.log("Gagal fetch booking", err));
+            }
+
+            async function getStatus() {
+                try {
+                    // Fetch booking detail
+                    const bookingRes = await fetch(`http://localhost:3000/bookings/${id_booking}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (bookingRes.ok) {
+                        const bookingData = await bookingRes.json();
+                        document.getElementById('event-date').innerText = bookingData.tanggal_event;
+                    }
+
+                    // Fetch payment detail
+                    const paymentRes = await fetch(`http://localhost:3000/payments/booking/${id_booking}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (paymentRes.ok) {
+                        const paymentData = await paymentRes.json();
+                        
+                        const jenisPembayaran =
+                            paymentData.jenis_pembayaran;
+                        const statusPembayaran =
+                            paymentData.status_pembayaran;
+
+                        const totalDibayar =
+                            paymentData.total_dibayar || 0;
+
+                        document.getElementById('dp-paid').innerText =
+                            "Rp " +
+                            totalDibayar.toLocaleString('id-ID');
+                        
+                        if (statusPembayaran === "dp") {
+                            document.getElementById("payment-label").innerText =
+                                "Total DP Terbayar";
+                        }
+
+                        if (statusPembayaran === "lunas") {
+                            document.getElementById("payment-label").innerText =
+                                "Total Pembayaran";
+                        }
+                        // Gunakan format agregat baru
+                        const dpPaidAmount = paymentData.total_dibayar > 0 ? paymentData.total_dibayar : (Math.round(Number(paymentData.jumlah_bayar)) || 0);
+                        document.getElementById('dp-paid').innerText = "Rp " + dpPaidAmount.toLocaleString('id-ID');
+                        
+                        const statusEl =
+                            document.getElementById('payment-status');
+
+                        if (statusPembayaran === "dp") {
+
+                            document.getElementById('status-title').innerText =
+                                "Pembayaran DP Berhasil!";
+
+                            document.getElementById('status-desc').innerText =
+                                "DP telah diterima. Sisa pembayaran dapat dilunasi sesuai kesepakatan dengan vendor.";
+
+                            statusEl.innerText =
+                                "DP Sudah Dibayar";
+
+                            statusEl.className =
+                                "font-bold text-orange-600";
+
+                            return true;
+                        }
+
+                        if (statusPembayaran === "lunas") {
+
+                            document.getElementById('status-title').innerText =
+                                "Pembayaran Lunas!";
+
+                            document.getElementById('status-desc').innerText =
+                                "Seluruh pembayaran telah diterima. Pesanan Anda telah lunas.";
+
+                            statusEl.innerText =
+                                "Lunas";
+
+                            statusEl.className =
+                                "font-bold text-emerald-600";
+
+                            return true;
+                        }
+
+                        statusEl.innerText =
+                            "Menunggu Pembayaran";
+
+                        statusEl.className =
+                            "font-bold text-yellow-600";
+                    }
+                } catch (err) {
+                    console.error("Gagal mengambil data status pembayaran:", err);
+                }
+                return false; // Lanjut polling
+            }
+
+            // Jalankan pencarian status awal
+            const stopPolling = await getStatus();
+            
+            // Polling jika status masih pending
+            if (!stopPolling) {
+                const interval = setInterval(async () => {
+                    const shouldStop = await getStatus();
+                    if (shouldStop) {
+                        clearInterval(interval);
+                    }
+                }, 3000);
+            }
+        });
+    </script>
+
+    </main>
+
+    <footer class="bg-[#0B1221] text-white py-12 px-6 border-t border-slate-800 mt-auto">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="space-y-2 text-center md:text-left">
+                <a href="../public/index.html" class="flex items-center justify-center md:justify-start space-x-2">
+                    <div class="bg-[#F27024] p-1.5 rounded-lg text-white">
+                        <i class="fa-regular fa-calendar-days text-sm text-white"></i>
+                    </div>
+                    <span class="text-lg font-bold tracking-tight text-white">EventVendor<span class="text-[#F27024]">Hub</span></span>
+                </a>
+                <p class="text-sm text-slate-400">© 2024 EventVendorHub. Indonesian Hospitality, Global Standards.</p>
+            </div>
+            <div class="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-300">
+                <a href="#" class="hover:text-[#F27024] transition-colors">About Us</a>
+                <a href="#" class="hover:text-[#F27024] transition-colors">Terms of Service</a>
+                <a href="#" class="hover:text-[#F27024] transition-colors">Privacy Policy</a>
+                <a href="#" class="hover:text-[#F27024] transition-colors">Contact Support</a>
+                <a href="#" class="hover:text-[#F27024] transition-colors">Vendor FAQ</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

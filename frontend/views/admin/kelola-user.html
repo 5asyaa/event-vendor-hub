@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola User - Admin Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-[#f8f9fc] text-slate-800 min-h-screen flex">
+
+<!-- SIDEBAR -->
+<aside class="w-64 bg-[#0a1120] text-gray-400 p-6 flex flex-col justify-between hidden md:flex min-h-screen sticky top-0">
+    <div class="space-y-8">
+        <div><span class="block font-bold text-lg text-white tracking-tight">EventVendorHub</span><span class="text-[10px] uppercase tracking-wider text-gray-500 block mt-0.5">Admin Portal</span></div>
+        <nav class="space-y-1 text-sm font-medium">
+            <a href="dashboard-admin.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+            <a href="verifikasi-vendor.html" class="flex items-center justify-between px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition">
+                <span class="flex items-center gap-3"><i class="fa-regular fa-id-card"></i> Verifikasi Vendor</span>
+                <span id="sidebar-vendor-count" class="bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">...</span>
+            </a>
+            <a href="kelola-user.html" class="flex items-center gap-3 bg-orange-500 text-white px-4 py-3 rounded-xl shadow-md font-semibold"><i class="fa-solid fa-users"></i> Kelola User</a>
+            <a href="pesanan-masuk.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-wallet"></i> Pesanan Masuk</a>
+            <a href="laporan-platform.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-chart-line"></i> Laporan</a>
+        </nav>
+    </div>
+    <div class="space-y-3">
+        <a href="profil-admin.html" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition"><i class="fa-solid fa-user"></i> Profil Saya</a>
+        <a href="#" onclick="doLogout()" class="flex items-center gap-3 px-4 py-2 text-sm hover:text-red-400 hover:bg-slate-900/50 rounded-lg transition"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+    </div>
+</aside>
+
+<main class="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full space-y-6">
+
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-900 tracking-tight">Kelola User</h1>
+            <p class="text-xs text-gray-400 mt-0.5">Daftar semua pengguna terdaftar di platform.</p>
+        </div>
+        <button onclick="loadUsers()" class="flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-orange-500 border border-slate-200 bg-white px-4 py-2 rounded-xl transition">
+            <i class="fa-solid fa-rotate-right"></i> Refresh
+        </button>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row gap-3 items-center">
+        <div class="relative w-full md:max-w-sm">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400"><i class="fa-solid fa-magnifying-glass text-xs"></i></span>
+            <input id="search-input" type="text" placeholder="Cari nama atau email..." oninput="filterAndRender()" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-9 pr-4 text-xs focus:outline-none focus:ring-1 focus:ring-orange-400">
+        </div>
+        <div class="flex gap-3 text-xs font-semibold w-full md:w-auto">
+            <select id="filter-role" onchange="filterAndRender()" class="bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 focus:outline-none flex-1 md:flex-initial">
+                <option value="">Semua Role</option>
+                <option value="vendor">Vendor</option>
+                <option value="customer">Customer</option>
+            </select>
+        </div>
+        <div class="ml-auto text-xs text-gray-400">Total: <span id="user-count" class="font-bold text-slate-700">—</span> pengguna</div>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100">
+                        <th class="py-3.5 px-6">User Info</th>
+                        <th class="py-3.5 px-6">Role</th>
+                        <th class="py-3.5 px-6">ID</th>
+                        <th class="py-3.5 px-6">No. Telepon</th>
+                        <th class="py-3.5 px-6 text-right">Detail</th>
+                    </tr>
+                </thead>
+                <tbody id="user-table-body" class="divide-y divide-gray-100 text-gray-600 font-medium">
+                    <tr><td colspan="5" class="py-10 text-center text-gray-400">
+                        <div class="flex flex-col items-center gap-3">
+                            <div class="w-7 h-7 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                            <span class="text-xs">Memuat data pengguna...</span>
+                        </div>
+                    </td></tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- Pagination -->
+        <div class="p-4 bg-gray-50/50 border-t border-gray-100 flex justify-between items-center text-xs text-gray-400">
+            <span id="pagination-info">—</span>
+            <div id="pagination-buttons" class="flex gap-1"></div>
+        </div>
+    </div>
+</main>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-6 right-6 z-50 hidden">
+    <div id="toast-inner" class="flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg text-sm font-semibold text-white">
+        <i id="toast-icon"></i><span id="toast-text"></span>
+    </div>
+</div>
+
+<script>
+const API = 'http://localhost:3000';
+const PAGE_SIZE = 15;
+let allUsers = [];
+let filteredUsers = [];
+let currentPage = 1;
+let vendorUserIds = new Set(); // id_user yang sudah punya profil vendor
+
+function doLogout() { localStorage.removeItem('session'); window.location.href = '../public/login.html'; }
+
+function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    document.getElementById('toast-inner').style.background = type === 'success' ? '#16a34a' : '#dc2626';
+    document.getElementById('toast-icon').className = type === 'success' ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-exclamation';
+    document.getElementById('toast-text').textContent = msg;
+    t.classList.remove('hidden');
+    setTimeout(() => t.classList.add('hidden'), 3000);
+}
+
+function filterAndRender() {
+    const q    = (document.getElementById('search-input').value || '').toLowerCase();
+    const role = document.getElementById('filter-role').value;
+    filteredUsers = allUsers.filter(u => {
+        const matchQ    = !q || (u.nama || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q);
+        const matchRole = !role || u.role === role;
+        return matchQ && matchRole;
+    });
+    currentPage = 1;
+    renderPage();
+}
+
+function renderPage() {
+    const tbody  = document.getElementById('user-table-body');
+    const total  = filteredUsers.length;
+    const pages  = Math.ceil(total / PAGE_SIZE);
+    const start  = (currentPage - 1) * PAGE_SIZE;
+    const slice  = filteredUsers.slice(start, start + PAGE_SIZE);
+
+    document.getElementById('user-count').textContent = total.toLocaleString('id-ID');
+    document.getElementById('pagination-info').textContent =
+        total > 0 ? `Menampilkan ${start + 1}–${Math.min(start + PAGE_SIZE, total)} dari ${total}` : '0 pengguna';
+
+    if (slice.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-10 text-center text-gray-400 text-xs">Tidak ada pengguna ditemukan.</td></tr>`;
+        return;
+    }
+
+    const ROLE_COLORS = { vendor: 'bg-orange-50 text-orange-700', customer: 'bg-blue-50 text-blue-700', admin: 'bg-purple-50 text-purple-700' };
+    tbody.innerHTML = slice.map(u => {
+        const initials = (u.nama || u.email || '?').substring(0, 2).toUpperCase();
+        const roleColor = ROLE_COLORS[u.role] || 'bg-gray-100 text-gray-700';
+        const phone = u.no_hp || '—';
+        const userId = u.id_user || u.id;
+        // Tombol buat profil vendor untuk user role vendor yang belum punya profil
+        const needsVendorProfile = u.role === 'vendor' && !vendorUserIds.has(Number(userId));
+        const actionBtn = needsVendorProfile
+            ? `<button onclick="buatProfilVendor(${userId}, '${(u.nama || u.email || '').replace(/'/g, '')}')" title="Buat profil vendor" class="text-orange-500 hover:text-orange-700 transition p-1 ml-1">
+                   <i class="fa-solid fa-store text-sm"></i>
+               </button>`
+            : '';
+        return `
+            <tr class="hover:bg-gray-50/50 transition">
+                <td class="py-3.5 px-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-xs flex-shrink-0">${initials}</div>
+                        <div>
+                            <span class="block font-bold text-slate-900">${u.nama || '—'}</span>
+                            <span class="text-[10px] text-gray-400 block">${u.email || '—'}</span>
+                        </div>
+                    </div>
+                </td>
+                <td class="py-3.5 px-6"><span class="${roleColor} text-[10px] font-bold px-2.5 py-0.5 rounded-full capitalize">${u.role || '—'}</span></td>
+                <td class="py-3.5 px-6 text-gray-400">#${userId || '—'}</td>
+                <td class="py-3.5 px-6 text-gray-500">${phone}</td>
+                <td class="py-3.5 px-6 text-right flex items-center justify-end gap-1">
+                    ${needsVendorProfile ? `<span class="text-[10px] text-orange-500 font-semibold bg-orange-50 px-2 py-0.5 rounded-full">Belum ada profil</span>` : ''}
+                    ${actionBtn}
+                    <button onclick="showToast('User ID #${userId}: ${(u.nama || '').replace(/'/g, '')}', 'success')" class="text-gray-400 hover:text-slate-900 transition p-1">
+                        <i class="fa-solid fa-circle-info text-sm"></i>
+                    </button>
+                </td>
+            </tr>`;
+    }).join('');
+
+    // Pagination buttons
+    const paginationEl = document.getElementById('pagination-buttons');
+    if (pages <= 1) { paginationEl.innerHTML = ''; return; }
+    let btns = '';
+    for (let i = 1; i <= pages; i++) {
+        btns += `<button onclick="goPage(${i})" class="w-7 h-7 rounded text-[11px] font-bold ${i === currentPage ? 'bg-[#0a1120] text-white' : 'bg-white border border-gray-200 text-slate-600 hover:bg-gray-50'}">${i}</button>`;
+    }
+    paginationEl.innerHTML = btns;
+}
+
+function goPage(p) { currentPage = p; renderPage(); }
+
+async function buatProfilVendor(id_user, nama_user) {
+    const session = JSON.parse(localStorage.getItem('session') || '{}');
+    const token   = session.token || '';
+    try {
+        const res = await fetch(`${API}/vendors/from-user`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ id_user, nama_user })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok && res.status !== 200) throw new Error(data.message || 'Gagal membuat profil vendor');
+        showToast(`Profil vendor untuk ${nama_user} berhasil dibuat! Menunggu verifikasi.`, 'success');
+        setTimeout(loadUsers, 800); // Reload untuk update tampilan
+    } catch (err) {
+        showToast(err.message, 'error');
+    }
+}
+
+async function loadUsers() {
+    document.getElementById('user-table-body').innerHTML = `<tr><td colspan="5" class="py-10 text-center text-gray-400"><div class="flex flex-col items-center gap-3"><div class="w-7 h-7 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div><span class="text-xs">Memuat data pengguna...</span></div></td></tr>`;
+    try {
+        const session = JSON.parse(localStorage.getItem('session') || '{}');
+        if (!session.isLoggedIn || session.role !== 'admin') { window.location.href = '../public/login.html'; return; }
+
+        const token   = session.token || '';
+        const headers = { 'Authorization': `Bearer ${token}` };
+
+        // Fetch semua user dari endpoint GET /auth/users (tidak perlu token - public)
+        // Fetch vendors untuk badge sidebar
+        const [allUsersRaw, vendors] = await Promise.all([
+            fetch(`${API}/auth/users`).then(r => {
+                if (!r.ok) throw new Error(`Gagal memuat data user (${r.status}). Pastikan auth-service sudah di-restart.`);
+                return r.json();
+            }),
+            fetch(`${API}/vendors`, { headers }).then(r => r.json()).catch(() => [])
+        ]);
+
+        document.getElementById('sidebar-vendor-count').textContent =
+            Array.isArray(vendors) ? vendors.filter(v => (v.status_verifikasi || 'pending') === 'pending').length || vendors.length : 0;
+
+        // Simpan id_user yang sudah punya profil vendor
+        vendorUserIds = new Set((Array.isArray(vendors) ? vendors : []).map(v => Number(v.id_user)));
+
+        allUsers      = allUsersRaw;
+        filteredUsers = [...allUsers];
+
+        renderPage();
+    } catch (err) {
+        console.error(err);
+        showToast(err.message || 'Gagal memuat data pengguna.', 'error');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', loadUsers);
+</script>
+</body>
+</html>

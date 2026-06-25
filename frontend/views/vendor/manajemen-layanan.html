@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Layanan - Vendor Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#f9f9fb] text-slate-800 font-['Inter'] min-h-screen flex">
+    <aside class="w-64 bg-[#0a1120] text-gray-400 p-6 flex flex-col justify-between hidden md:flex min-h-screen sticky top-0">
+        <div class="space-y-8">
+            <div class="cursor-pointer hover:opacity-80 transition-opacity" onclick="window.location.reload()">
+                <span class="block font-bold text-lg text-white tracking-tight">EventVendorHub</span>
+                <span class="text-[10px] uppercase tracking-wider text-gray-500 block mt-0.5">Vendor Portal</span>
+            </div>
+            <nav class="space-y-1 text-sm font-medium">
+                <a href="vendor-dashboard.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-chart-pie"></i> Dasbor</a>
+                <a href="pesanan-masuk.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-regular fa-calendar-check"></i> Pemesanan</a>
+                <a href="manajemen-layanan.html" class="flex items-center gap-3 bg-orange-500 text-white font-bold px-4 py-3 rounded-xl shadow-sm hover:bg-orange-600 transition"><i class="fa-solid fa-layer-group"></i> Layanan Saya</a>
+                <a href="analitik-vendor.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-chart-line"></i> Analisis</a>
+            </nav>
+        </div>
+        <div class="space-y-4">
+            <a href="profil-vendor.html" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition"><i class="fa-solid fa-user"></i> Lihat Profil</a>
+            <a href="#" onclick="localStorage.removeItem('session'); window.location.href='../public/login.html';" class="flex items-center gap-3 px-4 py-2 text-sm hover:text-red-400 hover:bg-slate-900/50 rounded-lg transition"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full space-y-6">
+        <div class="flex justify-between items-center">
+            <div><h1 class="text-2xl font-extrabold text-slate-900">Manajemen Paket Layanan</h1><p class="text-xs text-gray-400 mt-0.5">Kelola daftar layanan, harga, dan ketersediaan paket Anda.</p></div>
+            <button onclick="window.location.href='tambah-paket-baru.html'" class="bg-[#8b4513] text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm hover:bg-amber-950 transition">+ Tambah Paket Baru</button>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <table class="w-full text-left text-xs">
+                <thead>
+                    <tr class="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100"><th class="py-3.5 px-6">Nama Paket</th><th class="py-3.5 px-6">Kategori</th><th class="py-3.5 px-6">Harga Dasar</th><th class="py-3.5 px-6">Status</th></tr>
+                </thead>
+                <tbody id="services-table-body" class="divide-y divide-gray-100 text-gray-600 font-medium">
+                    <tr><td colspan="4" class="py-6 text-center text-gray-400">Memuat paket layanan...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async function() {
+            const session = JSON.parse(localStorage.getItem('session') || '{}');
+            if (!session.isLoggedIn || session.role !== 'vendor') {
+                window.location.href = '../public/login.html';
+                return;
+            }
+
+            const token   = session.token || '';
+            const headers = { 'Authorization': `Bearer ${token}` };
+
+            try {
+                const vendors = await fetch("http://localhost:3000/vendors", { headers }).then(r => r.json());
+                const currentVendor = vendors.find(v => v.id_user == session.id);
+
+                if (!currentVendor) {
+                    document.getElementById('services-table-body').innerHTML =
+                        `<tr><td colspan="4" class="py-6 text-center text-gray-400">Profil vendor belum terdaftar.</td></tr>`;
+                    return;
+                }
+
+                const services = await fetch("http://localhost:3000/services", { headers }).then(r => r.json());
+                const vendorServices = services.filter(s => s.id_vendor == currentVendor.id_vendor);
+
+                const tableBody = document.getElementById('services-table-body');
+                tableBody.innerHTML = "";
+
+                if (vendorServices.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-gray-400">Belum ada layanan yang ditambahkan. Silakan klik tombol di atas untuk menambah paket baru.</td></tr>`;
+                    return;
+                }
+
+                vendorServices.forEach(service => {
+                    // Gunakan image default jika URL kosong/salah
+                    const imgUrl = service.gambar_paket || 'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&q=80&w=100';
+                    const hargaFormatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(service.harga);
+                    
+                    tableBody.innerHTML += `
+                        <tr class="hover:bg-gray-50/50">
+                            <td class="py-4 px-6 flex items-center gap-3">
+                                <div class="w-10 h-10 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
+                                    <img src="${imgUrl}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&q=80&w=100'">
+                                </div>
+                                <div>
+                                    <span class="block font-bold text-slate-900 text-sm">${service.nama_paket}</span>
+                                    <span class="text-[10px] text-gray-400 block">${service.deskripsi_layanan || ''}</span>
+                                </div>
+                            </td>
+                            <td class="py-4 px-6"><span class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-[10px] font-bold">${service.jenis_jasa}</span></td>
+                            <td class="py-4 px-6 font-bold text-slate-900">${hargaFormatted}</td>
+                            <td class="py-4 px-6"><span class="text-emerald-600">&bull; Aktif</span></td>
+                        </tr>
+                    `;
+                });
+
+            } catch (error) {
+                console.error("Gagal memuat data layanan:", error);
+            }
+        });
+    </script>
+</body>
+</html>

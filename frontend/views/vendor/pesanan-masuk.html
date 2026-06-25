@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesanan Masuk - Vendor Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#f9f9fb] text-slate-800 font-['Inter'] min-h-screen flex">
+    <aside class="w-64 bg-[#0a1120] text-gray-400 p-6 flex flex-col justify-between hidden md:flex min-h-screen sticky top-0">
+        <div class="space-y-8">
+            <div class="cursor-pointer hover:opacity-80 transition-opacity" onclick="window.location.reload()">
+                <span class="block font-bold text-lg text-white tracking-tight">EventVendorHub</span>
+                <span class="text-[10px] uppercase tracking-wider text-gray-500 block mt-0.5">Vendor Portal</span>
+            </div>
+            <nav class="space-y-1 text-sm font-medium">
+                <a href="vendor-dashboard.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-chart-pie"></i> Dasbor</a>
+                <a href="pesanan-masuk.html" class="flex items-center gap-3 bg-orange-500 text-white font-bold px-4 py-3 rounded-xl shadow-sm hover:bg-orange-600 transition"><i class="fa-regular fa-calendar-check"></i> Pemesanan</a>
+                <a href="manajemen-layanan.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-layer-group"></i> Layanan Saya</a>
+                <a href="analitik-vendor.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-chart-line"></i> Analisis</a>
+            </nav>
+        </div>
+        <div class="space-y-4">
+            <a href="profil-vendor.html" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition"><i class="fa-solid fa-user"></i> Lihat Profil</a>
+            <a href="#" onclick="localStorage.removeItem('session'); window.location.href='../public/login.html';" class="flex items-center gap-3 px-4 py-2 text-sm hover:text-red-400 hover:bg-slate-900/50 rounded-lg transition"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-6 md:p-10 max-w-5xl mx-auto w-full space-y-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-extrabold text-slate-900">Pesanan Masuk</h1>
+                <p class="text-xs text-gray-400 mt-0.5">Kelola permintaan booking untuk layanan Anda.</p>
+            </div>
+            <button onclick="loadBookings()" class="flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-orange-500 border border-slate-200 bg-white px-4 py-2 rounded-xl transition">
+                <i class="fa-solid fa-rotate-right"></i> Refresh
+            </button>
+        </div>
+
+        <!-- Info halaman + filter status -->
+        <div id="pagination-info-bar" class="hidden flex flex-wrap items-center justify-between gap-3">
+            <span id="pagination-info" class="text-xs text-gray-400 font-medium"></span>
+            <div class="flex items-center gap-2">
+                <label class="text-xs text-gray-400 font-medium">Filter:</label>
+                <select id="status-filter" onchange="applyFilter()" class="text-xs border border-gray-200 rounded-lg px-3 py-1.5 bg-white text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-orange-400">
+                    <option value="all">Semua Status</option>
+                    <option value="pending">Menunggu Konfirmasi</option>
+                    <option value="confirmed">Diterima</option>
+                    <option value="rejected">Ditolak</option>
+                    <option value="completed">Selesai</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="bookings-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="col-span-2 flex items-center justify-center py-12">
+                <div class="flex flex-col items-center gap-3 text-slate-400">
+                    <div class="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                    <span class="text-xs font-medium">Memuat pesanan...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div id="pagination-controls" class="hidden flex items-center justify-center gap-2 pb-4">
+            <button id="btn-prev" onclick="changePage(-1)"
+                class="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-xl border border-gray-200 bg-white text-slate-600 hover:bg-orange-50 hover:border-orange-300 hover:text-orange-600 transition disabled:opacity-30 disabled:cursor-not-allowed">
+                <i class="fa-solid fa-chevron-left"></i> Sebelumnya
+            </button>
+            <div id="page-numbers" class="flex items-center gap-1"></div>
+            <button id="btn-next" onclick="changePage(1)"
+                class="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-xl border border-gray-200 bg-white text-slate-600 hover:bg-orange-50 hover:border-orange-300 hover:text-orange-600 transition disabled:opacity-30 disabled:cursor-not-allowed">
+                Berikutnya <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 hidden transition-all duration-300">
+        <div id="toast-inner" class="flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg text-sm font-semibold text-white">
+            <i id="toast-icon" class="fa-solid fa-circle-check"></i>
+            <span id="toast-text"></span>
+        </div>
+    </div>
+
+    <script>
+        // ── Config ────────────────────────────────────────
+        const PAGE_SIZE = 6;
+
+        // ── State ─────────────────────────────────────────
+        let allBookings   = [];   // semua pesanan vendor (sudah di-resolve customer name)
+        let vendorSvcs    = [];   // layanan milik vendor
+        let filteredList  = [];   // hasil filter status
+        let currentPage   = 1;
+
+        // ── Toast helper ──────────────────────────────────
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            const inner = document.getElementById('toast-inner');
+            const icon  = document.getElementById('toast-icon');
+            const text  = document.getElementById('toast-text');
+
+            text.textContent = msg;
+            if (type === 'success') {
+                inner.style.background = '#16a34a';
+                icon.className = 'fa-solid fa-circle-check';
+            } else {
+                inner.style.background = '#dc2626';
+                icon.className = 'fa-solid fa-circle-exclamation';
+            }
+
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+
+        // ── Status maps ───────────────────────────────────
+        const PAYMENT_STATUS_MAP = {
+            'belum_bayar': { cls: 'bg-gray-100 text-gray-600',                                     label: 'Belum Bayar' },
+            'dp':          { cls: 'bg-blue-50 text-blue-600 border border-blue-100',               label: 'DP Terbayar' },
+            'lunas':       { cls: 'bg-emerald-50 text-emerald-600 border border-emerald-100',      label: 'Lunas' }
+        };
+
+        const BOOKING_STATUS_MAP = {
+            'pending':   { cls: 'bg-orange-100 text-orange-700',   label: 'Menunggu Konfirmasi' },
+            'confirmed': { cls: 'bg-emerald-100 text-emerald-700', label: 'Diterima' },
+            'rejected':  { cls: 'bg-red-100 text-red-700',         label: 'Ditolak' },
+            'completed': { cls: 'bg-blue-100 text-blue-700',       label: 'Selesai' }
+        };
+
+        // ── Init ──────────────────────────────────────────
+        document.addEventListener("DOMContentLoaded", loadBookings);
+
+        async function loadBookings() {
+            const container = document.getElementById("bookings-container");
+            document.getElementById("pagination-controls").classList.add("hidden");
+            document.getElementById("pagination-info-bar").classList.add("hidden");
+
+            container.innerHTML = `
+                <div class="col-span-2 flex items-center justify-center py-12">
+                    <div class="flex flex-col items-center gap-3 text-slate-400">
+                        <div class="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                        <span class="text-xs font-medium">Memuat pesanan...</span>
+                    </div>
+                </div>`;
+
+            try {
+                const session = JSON.parse(localStorage.getItem('session') || '{}');
+                if (!session.isLoggedIn || session.role !== 'vendor') {
+                    container.innerHTML = `<p class="text-xs text-red-500 col-span-2">Silakan login sebagai vendor terlebih dahulu.</p>`;
+                    return;
+                }
+
+                const token   = session.token || '';
+                const headers = { 'Authorization': `Bearer ${token}` };
+
+                // 1. Cari vendor yang sesuai user login
+                const vendors       = await fetch("http://localhost:3000/vendors", { headers }).then(r => r.json());
+                const currentVendor = vendors.find(v => Number(v.id_user) === Number(session.id));
+                if (!currentVendor) {
+                    container.innerHTML = `<p class="text-xs text-red-500 col-span-2">Profil vendor tidak ditemukan.</p>`;
+                    return;
+                }
+
+                // 2. Ambil layanan & booking milik vendor ini
+                const services   = await fetch("http://localhost:3000/services", { headers }).then(r => r.json());
+                vendorSvcs       = services.filter(s => Number(s.id_vendor) === Number(currentVendor.id_vendor));
+                const svcIds     = vendorSvcs.map(s => Number(s.id_service));
+
+                const rawBookings = await fetch("http://localhost:3000/bookings", { headers }).then(r => r.json());
+                const sorted      = rawBookings
+                    .filter(b => svcIds.includes(Number(b.id_service)))
+                    .sort((a, b) => b.id_booking - a.id_booking);
+
+                if (sorted.length === 0) {
+                    container.innerHTML = `<p class="text-xs text-gray-400 col-span-2">Tidak ada pesanan masuk saat ini.</p>`;
+                    return;
+                }
+
+                // 3. Resolve nama customer untuk semua booking sekaligus
+                const userCache = {};
+                await Promise.all(sorted.map(async (b) => {
+                    if (userCache[b.id_user] !== undefined) return;
+                    try {
+                        const u = await fetch(`http://localhost:3000/auth/users/${b.id_user}`);
+                        if (u.ok) { const ud = await u.json(); userCache[b.id_user] = ud.nama || null; }
+                    } catch(e) {}
+                    if (userCache[b.id_user] === undefined) userCache[b.id_user] = null;
+                }));
+
+                allBookings = sorted.map(b => ({
+                    ...b,
+                    _customerName: userCache[b.id_user] || `Pelanggan #${b.id_user}`
+                }));
+
+                // 4. Reset filter & render
+                document.getElementById('status-filter').value = 'all';
+                currentPage = 1;
+                applyFilter();
+
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = `<p class="text-xs text-red-500 col-span-2">Gagal memuat pesanan. Pastikan API Gateway berjalan.</p>`;
+            }
+        }
+
+        // ── Filter & render ulang ─────────────────────────
+        function applyFilter() {
+            const filter = document.getElementById('status-filter').value;
+            filteredList  = filter === 'all'
+                ? [...allBookings]
+                : allBookings.filter(b => b.status === filter);
+            currentPage = 1;
+            renderPage();
+        }
+
+        // ── Render halaman aktif ──────────────────────────
+        function renderPage() {
+            const container    = document.getElementById("bookings-container");
+            const totalPages   = Math.ceil(filteredList.length / PAGE_SIZE);
+            const start        = (currentPage - 1) * PAGE_SIZE;
+            const pageBookings = filteredList.slice(start, start + PAGE_SIZE);
+
+            container.innerHTML = "";
+
+            if (filteredList.length === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-400 col-span-2">Tidak ada pesanan untuk filter ini.</p>`;
+                document.getElementById("pagination-controls").classList.add("hidden");
+                document.getElementById("pagination-info-bar").classList.add("hidden");
+                return;
+            }
+
+            for (const booking of pageBookings) {
+                const service     = vendorSvcs.find(s => Number(s.id_service) === Number(booking.id_service));
+                const serviceName = service ? service.nama_paket : `Layanan #${booking.id_service}`;
+                const customerName = booking._customerName;
+
+                const spKey   = booking.status_pembayaran || 'belum_bayar';
+                const spInfo  = PAYMENT_STATUS_MAP[spKey]  || { cls: 'bg-gray-100 text-gray-600', label: spKey };
+                const bsInfo  = BOOKING_STATUS_MAP[booking.status] || { cls: 'bg-gray-100 text-gray-700', label: booking.status };
+
+                const borderColor = booking.status === 'confirmed' ? 'border-emerald-500'
+                                  : booking.status === 'rejected'  ? 'border-red-500'
+                                  : 'border-orange-500';
+
+                const isPending = booking.status === 'pending';
+
+                const card = document.createElement("div");
+                card.className = `bg-white p-5 rounded-2xl border border-gray-100 shadow-sm space-y-4 border-l-4 ${borderColor}`;
+                card.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold text-xs flex-shrink-0">
+                            ${customerName.substring(0, 2).toUpperCase()}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-bold text-sm text-slate-900 truncate">${customerName}
+                                <span class="ml-1 ${bsInfo.cls} text-[10px] font-bold px-2 py-0.5 rounded">${bsInfo.label}</span>
+                            </h4>
+                            <span class="text-[11px] text-gray-400">${booking.no_telepon || '-'}</span>
+                        </div>
+                        <span class="${spInfo.cls} text-[10px] font-bold px-2.5 py-1 rounded-full flex-shrink-0">${spInfo.label}</span>
+                    </div>
+
+                    <div class="bg-gray-50 p-3 rounded-xl text-xs space-y-2 text-gray-600">
+                        <div>
+                            <span class="text-gray-400 block text-[10px] uppercase font-bold">Booking ID</span>
+                            <span class="font-bold text-slate-900">#EVH-${booking.id_booking}</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-400 block text-[10px] uppercase font-bold">Layanan Dipesan</span>
+                            <span class="font-bold text-slate-900">${serviceName}</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <span class="text-gray-400 block text-[10px] uppercase font-bold">Tanggal Event</span>
+                                <span class="font-semibold text-slate-900">${new Date(booking.tanggal_event).toLocaleDateString('id-ID', {day:'numeric',month:'short',year:'numeric'})}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-400 block text-[10px] uppercase font-bold">Total Harga</span>
+                                <span class="font-semibold text-orange-600">Rp ${Number(booking.total_harga).toLocaleString('id-ID')}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="text-gray-400 block text-[10px] uppercase font-bold">Lokasi</span>
+                            <span class="font-semibold text-slate-900">${booking.lokasi}</span>
+                        </div>
+                        ${booking.catatan ? `<div><span class="text-gray-400 block text-[10px] uppercase font-bold">Catatan</span><span>${booking.catatan}</span></div>` : ''}
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 pt-1">
+                        <button
+                            onclick="handleAction(${booking.id_booking}, 'confirm', this)"
+                            class="w-full bg-[#8b4513] hover:bg-amber-950 text-white font-bold py-2.5 rounded-xl text-xs transition ${!isPending ? 'opacity-40 cursor-not-allowed' : ''}"
+                            ${!isPending ? 'disabled' : ''}>
+                            <i class="fa-solid fa-check mr-1"></i> Terima
+                        </button>
+                        <button
+                            onclick="handleAction(${booking.id_booking}, 'reject', this)"
+                            class="w-full border border-red-200 text-red-600 font-bold py-2.5 rounded-xl text-xs hover:bg-red-50 transition ${!isPending ? 'opacity-40 cursor-not-allowed' : ''}"
+                            ${!isPending ? 'disabled' : ''}>
+                            <i class="fa-solid fa-xmark mr-1"></i> Tolak
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            }
+
+            // Update info bar
+            const infoBar = document.getElementById("pagination-info-bar");
+            const infoEl  = document.getElementById("pagination-info");
+            infoBar.classList.remove("hidden");
+            infoEl.textContent = `Halaman ${currentPage} dari ${totalPages} · ${filteredList.length} pesanan`;
+
+            // Update pagination controls
+            const controls = document.getElementById("pagination-controls");
+            if (totalPages <= 1) {
+                controls.classList.add("hidden");
+                return;
+            }
+            controls.classList.remove("hidden");
+
+            document.getElementById("btn-prev").disabled = currentPage === 1;
+            document.getElementById("btn-next").disabled = currentPage === totalPages;
+
+            // Render nomor halaman (max 7 tombol dengan ellipsis)
+            const pageNumbers = document.getElementById("page-numbers");
+            pageNumbers.innerHTML = "";
+            const pages = buildPageRange(currentPage, totalPages);
+            for (const p of pages) {
+                if (p === '…') {
+                    const el = document.createElement("span");
+                    el.className = "px-2 text-gray-400 text-xs select-none";
+                    el.textContent = "…";
+                    pageNumbers.appendChild(el);
+                } else {
+                    const btn = document.createElement("button");
+                    btn.textContent = p;
+                    btn.className = p === currentPage
+                        ? "w-8 h-8 rounded-lg text-xs font-bold bg-orange-500 text-white"
+                        : "w-8 h-8 rounded-lg text-xs font-semibold border border-gray-200 bg-white text-slate-600 hover:bg-orange-50 hover:border-orange-300 hover:text-orange-600 transition";
+                    btn.onclick = () => { currentPage = p; renderPage(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+                    pageNumbers.appendChild(btn);
+                }
+            }
+        }
+
+        // Buat range nomor halaman dengan ellipsis
+        function buildPageRange(cur, total) {
+            if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+            if (cur <= 4)   return [1, 2, 3, 4, 5, '…', total];
+            if (cur >= total - 3) return [1, '…', total-4, total-3, total-2, total-1, total];
+            return [1, '…', cur - 1, cur, cur + 1, '…', total];
+        }
+
+        // Prev / Next
+        function changePage(delta) {
+            const totalPages = Math.ceil(filteredList.length / PAGE_SIZE);
+            currentPage = Math.max(1, Math.min(totalPages, currentPage + delta));
+            renderPage();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ── Aksi terima / tolak ───────────────────────────
+        async function handleAction(id_booking, action, btn) {
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Memproses...';
+
+                const res = await fetch(`http://localhost:3000/bookings/${id_booking}/${action}`, {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${(JSON.parse(localStorage.getItem('session')||'{}').token||'')}`
+                    }
+                });
+                if (!res.ok) throw new Error(`Gagal ${action === 'confirm' ? 'menerima' : 'menolak'} pesanan`);
+
+                showToast(
+                    `Booking #${id_booking} berhasil di${action === 'confirm' ? 'terima' : 'tolak'}.`,
+                    'success'
+                );
+
+                setTimeout(loadBookings, 800);
+
+            } catch (err) {
+                showToast(err.message, 'error');
+                btn.disabled = false;
+                btn.innerHTML = action === 'confirm'
+                    ? '<i class="fa-solid fa-check mr-1"></i> Terima'
+                    : '<i class="fa-solid fa-xmark mr-1"></i> Tolak';
+            }
+        }
+    </script>
+</body>
+</html>

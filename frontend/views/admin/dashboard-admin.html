@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - EventVendorHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .interactive-card { transition: all 0.3s ease; cursor: pointer; }
+        .interactive-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+        .btn-press { transition: all 0.15s ease-in-out; }
+        .btn-press:active { transform: scale(0.95); }
+    </style>
+</head>
+<body class="bg-[#f8f9fc] text-slate-800 min-h-screen flex">
+
+<!-- SIDEBAR -->
+<aside class="w-64 bg-[#0a1120] text-gray-400 p-6 flex flex-col justify-between hidden md:flex min-h-screen sticky top-0">
+    <div class="space-y-8">
+        <div>
+            <span class="block font-bold text-lg text-white tracking-tight">EventVendorHub</span>
+            <span class="text-[10px] uppercase tracking-wider text-gray-500 block mt-0.5">Admin Portal</span>
+            <span id="sidebar-admin-name" class="text-xs text-gray-400 block mt-1">—</span>
+        </div>
+        <nav class="space-y-1 text-sm font-medium">
+            <a href="dashboard-admin.html" class="flex items-center gap-3 bg-orange-500 text-white px-4 py-3 rounded-xl shadow-md font-semibold"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+            <a href="verifikasi-vendor.html" class="flex items-center justify-between px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition">
+                <span class="flex items-center gap-3"><i class="fa-regular fa-id-card"></i> Verifikasi Vendor</span>
+                <span id="sidebar-vendor-count" class="bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">...</span>
+            </a>
+            <a href="kelola-user.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-users"></i> Kelola User</a>
+            <a href="pesanan-masuk.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-wallet"></i> Pesanan Masuk</a>
+            <a href="laporan-platform.html" class="flex items-center gap-3 px-4 py-3 hover:text-white hover:bg-slate-800 rounded-xl transition"><i class="fa-solid fa-chart-line"></i> Laporan</a>
+        </nav>
+    </div>
+    <div class="space-y-3">
+        <a href="profil-admin.html" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition"><i class="fa-solid fa-user"></i> Profil Saya</a>
+        <a href="#" onclick="doLogout()" class="flex items-center gap-3 px-4 py-2 text-sm hover:text-red-400 hover:bg-slate-900/50 rounded-lg transition"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+    </div>
+</aside>
+
+<!-- MAIN -->
+<main class="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full space-y-8">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 class="text-xl font-black text-slate-900 tracking-tight">Admin Overview</h1>
+            <p class="text-xs text-gray-400 mt-0.5">Berikut adalah kabar terbaru dari EventVendorHub hari ini.</p>
+        </div>
+        <button onclick="initDashboard()" class="flex items-center gap-2 bg-white border border-gray-200 text-slate-700 font-bold text-xs py-2 px-4 rounded-xl hover:bg-gray-50 transition shadow-sm btn-press">
+            <i class="fa-solid fa-rotate-right"></i> Refresh
+        </button>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <div class="bg-white p-4 rounded-2xl border border-gray-100 interactive-card" onclick="window.location.href='kelola-user.html'">
+            <span class="text-xs text-gray-400 font-semibold block">Total Pengguna</span>
+            <span id="stat-users" class="text-2xl font-black text-slate-900 block mt-2">—</span>
+            <span class="text-[10px] text-gray-400 block mt-1">Customer + Vendor</span>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-gray-100 interactive-card" onclick="window.location.href='verifikasi-vendor.html'">
+            <span class="text-xs text-gray-400 font-semibold block">Total Vendor</span>
+            <span id="stat-vendors" class="text-2xl font-black text-slate-900 block mt-2">—</span>
+            <span class="text-[10px] text-gray-400 block mt-1">Terdaftar di platform</span>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-orange-200 bg-orange-50/30 interactive-card" onclick="window.location.href='pesanan-masuk.html'">
+            <span class="text-[10px] text-orange-600 font-bold bg-orange-100 px-2 py-0.5 rounded-sm float-right">Aktif</span>
+            <span class="text-xs text-gray-400 font-semibold block">Booking Pending</span>
+            <span id="stat-pending" class="text-2xl font-black text-orange-600 block mt-2">—</span>
+            <span class="text-[10px] text-orange-700 font-medium block mt-1">Butuh tindakan</span>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-gray-100 interactive-card" onclick="window.location.href='pesanan-masuk.html'">
+            <span class="text-xs text-gray-400 font-semibold block">Total Booking</span>
+            <span id="stat-bookings" class="text-2xl font-black text-slate-900 block mt-2">—</span>
+            <span class="text-[10px] text-gray-400 block mt-1">Semua status</span>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-gray-100 interactive-card" onclick="window.location.href='laporan-platform.html'">
+            <span class="text-xs text-gray-400 font-semibold block">Total Pendapatan</span>
+            <span id="stat-revenue" class="text-lg font-black text-amber-700 block mt-2">—</span>
+            <span class="text-[10px] text-gray-400 block mt-1">Dari booking lunas</span>
+        </div>
+    </div>
+
+    <!-- CHART + KATEGORI -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-bold text-sm text-slate-900">Booking per Bulan (6 Bulan Terakhir)</h3>
+            </div>
+            <div class="h-64"><canvas id="adminChart"></canvas></div>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-4">
+            <h3 class="font-bold text-sm text-slate-900">Status Booking</h3>
+            <div id="booking-status-breakdown" class="space-y-3 pt-1">
+                <div class="text-xs text-gray-400">Memuat...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABEL VENDOR TERBARU -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="flex justify-between items-center p-5 border-b border-gray-100">
+            <h3 class="font-bold text-sm text-slate-900">Vendor Terdaftar Terbaru</h3>
+            <a href="verifikasi-vendor.html" class="text-xs font-semibold text-orange-600 hover:text-orange-800 hover:bg-orange-50 px-3 py-1.5 rounded-lg transition">Lihat Semua</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100">
+                        <th class="py-3 px-6">Nama Vendor</th>
+                        <th class="py-3 px-6">Kategori</th>
+                        <th class="py-3 px-6">Lokasi</th>
+                        <th class="py-3 px-6">Rating</th>
+                        <th class="py-3 px-6 text-right">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="vendor-table-body" class="divide-y divide-gray-100 text-gray-600 font-medium">
+                    <tr><td colspan="5" class="py-8 text-center text-gray-400 text-xs">Memuat data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-6 right-6 z-50 hidden">
+    <div id="toast-inner" class="flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg text-sm font-semibold text-white">
+        <i id="toast-icon"></i><span id="toast-text"></span>
+    </div>
+</div>
+
+<script>
+const API = 'http://localhost:3000';
+
+function doLogout() {
+    localStorage.removeItem('session');
+    window.location.href = '../public/login.html';
+}
+
+function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    document.getElementById('toast-inner').style.background = type === 'success' ? '#16a34a' : '#dc2626';
+    document.getElementById('toast-icon').className = type === 'success' ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-exclamation';
+    document.getElementById('toast-text').textContent = msg;
+    t.classList.remove('hidden');
+    setTimeout(() => t.classList.add('hidden'), 3000);
+}
+
+function formatRupiah(n) {
+    if (n >= 1e9) return 'Rp ' + (n / 1e9).toFixed(1) + 'M';
+    if (n >= 1e6) return 'Rp ' + (n / 1e6).toFixed(1) + 'jt';
+    return 'Rp ' + Number(n).toLocaleString('id-ID');
+}
+
+// Helper: safe fetch — returns null on non-ok / network error
+async function safeFetch(url, options = {}) {
+    try {
+        const res = await fetch(url, options);
+        if (res.status === 401) {
+            localStorage.removeItem('session');
+            window.location.href = '../public/login.html';
+            return null;
+        }
+        if (!res.ok) {
+            console.warn(`Fetch ${url} gagal: ${res.status}`);
+            return null;
+        }
+        return await res.json();
+    } catch (e) {
+        console.warn(`Fetch ${url} error:`, e.message);
+        return null;
+    }
+}
+
+let chartInstance = null;
+
+async function initDashboard() {
+    // Guard admin
+    const session = JSON.parse(localStorage.getItem('session') || '{}');
+    if (!session.isLoggedIn || session.role !== 'admin') {
+        window.location.href = '../public/login.html';
+        return;
+    }
+
+    // Tampilkan nama admin di sidebar
+    const adminNameEl = document.getElementById('sidebar-admin-name');
+    if (adminNameEl) adminNameEl.textContent = session.nama || 'Admin';
+
+    const token = session.token || '';
+    const authHeaders = { 'Authorization': `Bearer ${token}` };
+
+    // Set semua stat ke loading state
+    ['stat-users','stat-vendors','stat-bookings','stat-pending'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = '...';
+    });
+    const revenueEl = document.getElementById('stat-revenue');
+    if (revenueEl) revenueEl.textContent = '...';
+
+    // Fetch semua data secara paralel
+    const [vendors, services, bookings, users] = await Promise.all([
+        safeFetch(`${API}/vendors`, { headers: authHeaders }),
+        safeFetch(`${API}/services`, { headers: authHeaders }),
+        safeFetch(`${API}/bookings`, { headers: authHeaders }),
+        safeFetch(`${API}/auth/users`, { headers: authHeaders })
+    ]);
+
+    // Gunakan array kosong jika fetch gagal (layanan mungkin belum jalan)
+    const vendorList  = Array.isArray(vendors)  ? vendors  : [];
+    const serviceList = Array.isArray(services) ? services : [];
+    const bookingList = Array.isArray(bookings) ? bookings : [];
+    const userList    = Array.isArray(users)    ? users    : [];
+
+    // ── Stat Cards ───────────────────────────────────────────
+    // Total user dari auth-service (sumber kebenaran)
+    const totalUsers = userList.length > 0
+        ? userList.length
+        : (() => {
+            // Fallback: hitung unique dari bookings + vendors jika /auth/users belum tersedia
+            const ids = new Set([
+                ...bookingList.map(b => b.id_user),
+                ...vendorList.map(v => v.id_user)
+            ]);
+            return ids.size;
+        })();
+
+    document.getElementById('stat-users').textContent    = totalUsers.toLocaleString('id-ID');
+    document.getElementById('stat-vendors').textContent  = vendorList.length.toLocaleString('id-ID');
+    document.getElementById('stat-bookings').textContent = bookingList.length.toLocaleString('id-ID');
+    document.getElementById('sidebar-vendor-count').textContent = vendorList.length;
+
+    const pendingVendors  = vendorList.filter(v => (v.status_verifikasi || 'pending') === 'pending');
+    const pendingBookings = bookingList.filter(b => b.status === 'pending');
+    document.getElementById('stat-pending').textContent = pendingBookings.length;
+
+    // Badge sidebar: jumlah vendor pending verifikasi
+    document.getElementById('sidebar-vendor-count').textContent = pendingVendors.length || vendorList.length;
+
+    const totalRevenue = bookingList
+        .filter(b => b.status_pembayaran === 'lunas')
+        .reduce((sum, b) => sum + Number(b.total_harga || 0), 0);
+    document.getElementById('stat-revenue').textContent = formatRupiah(totalRevenue);
+
+    // ── Status Breakdown ──────────────────────────────────────
+    const statusCount = { pending: 0, confirmed: 0, completed: 0, rejected: 0 };
+    bookingList.forEach(b => { if (b.status in statusCount) statusCount[b.status]++; });
+    const totalBookings = bookingList.length || 1;
+    const statusCfg = {
+        pending:   { label: 'Menunggu',      color: '#f97316' },
+        confirmed: { label: 'Dikonfirmasi',  color: '#16a34a' },
+        completed: { label: 'Selesai',       color: '#2563eb' },
+        rejected:  { label: 'Ditolak',       color: '#dc2626' }
+    };
+    document.getElementById('booking-status-breakdown').innerHTML =
+        Object.entries(statusCount).map(([key, cnt]) => {
+            const pct = Math.round((cnt / totalBookings) * 100);
+            const cfg = statusCfg[key];
+            return `
+                <div>
+                    <div class="flex justify-between text-xs font-semibold mb-1">
+                        <span class="text-slate-600">${cfg.label}</span>
+                        <span class="text-slate-900">${cnt} <span class="text-gray-400 font-normal">(${pct}%)</span></span>
+                    </div>
+                    <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                        <div class="h-full rounded-full" style="width:${pct}%;background:${cfg.color};"></div>
+                    </div>
+                </div>`;
+        }).join('');
+
+    // ── Chart: booking per bulan (6 bulan terakhir) ───────────
+    const monthNames = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+    const now = new Date();
+    const last6 = Array.from({ length: 6 }, (_, i) => {
+        const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
+        return { label: monthNames[d.getMonth()] + ' ' + String(d.getFullYear()).slice(2), month: d.getMonth(), year: d.getFullYear(), count: 0 };
+    });
+    bookingList.forEach(b => {
+        // Gunakan created_at jika tanggal_event tidak ada
+        const raw = b.tanggal_event || b.created_at;
+        const d = raw ? new Date(raw) : null;
+        if (d && !isNaN(d)) {
+            const slot = last6.find(s => s.month === d.getMonth() && s.year === d.getFullYear());
+            if (slot) slot.count++;
+        }
+    });
+
+    if (chartInstance) chartInstance.destroy();
+    chartInstance = new Chart(document.getElementById('adminChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: last6.map(s => s.label),
+            datasets: [{
+                data: last6.map(s => s.count),
+                backgroundColor: last6.map((_, i) => i === 5 ? '#f97316' : '#cbd5e1'),
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { ticks: { precision: 0, stepSize: 1 } }, x: { grid: { display: false } } }
+        }
+    });
+
+    // ── Tabel Vendor Terbaru ──────────────────────────────────
+    // Tampilkan 5 vendor terbaru berdasarkan id_vendor terbesar
+    const recentVendors = [...vendorList]
+        .sort((a, b) => (b.id_vendor || 0) - (a.id_vendor || 0))
+        .slice(0, 5);
+
+    const tbody = document.getElementById('vendor-table-body');
+    if (recentVendors.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-gray-400 text-xs">Belum ada vendor terdaftar.</td></tr>`;
+    } else {
+        const statusBadge = {
+            approved: `<span class="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full">✓ Terverifikasi</span>`,
+            pending:  `<span class="bg-orange-100 text-orange-700 text-[10px] font-bold px-2 py-0.5 rounded-full">⏳ Menunggu</span>`,
+            rejected: `<span class="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full">✗ Ditolak</span>`
+        };
+        tbody.innerHTML = recentVendors.map(v => {
+            const initials = (v.nama_usaha || '?').substring(0, 2).toUpperCase();
+            const rating   = v.rating_avg ? `<span class="text-amber-500">★</span> ${Number(v.rating_avg).toFixed(1)}` : '<span class="text-gray-400">—</span>';
+            const kategori = v.jenis_jasa || '—';
+            const badge    = statusBadge[v.status_verifikasi || 'pending'] || statusBadge.pending;
+            return `
+                <tr class="hover:bg-gray-50/80 transition cursor-pointer" onclick="window.location.href='verifikasi-vendor.html'">
+                    <td class="py-3.5 px-6">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-slate-800 text-white font-bold flex items-center justify-center text-xs">${initials}</div>
+                            <div>
+                                <span class="font-bold text-slate-900 block">${v.nama_usaha || '—'}</span>
+                                <span class="block mt-0.5">${badge}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-3.5 px-6 text-gray-500">${kategori}</td>
+                    <td class="py-3.5 px-6 text-gray-500">${v.alamat || '—'}</td>
+                    <td class="py-3.5 px-6 text-xs font-semibold">${rating}</td>
+                    <td class="py-3.5 px-6 text-right">
+                        <a href="verifikasi-vendor.html" class="bg-white border border-gray-200 text-slate-900 hover:bg-slate-900 hover:text-white font-bold px-3 py-1.5 rounded-lg transition text-[10px] btn-press">Detail</a>
+                    </td>
+                </tr>`;
+        }).join('');
+    }
+
+    // Tampilkan info jika beberapa layanan tidak tersambung
+    if (!vendors || !bookings) {
+        showToast('Beberapa data tidak tersedia. Pastikan semua service berjalan.', 'error');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', initDashboard);
+</script>
+</body>
+</html>
