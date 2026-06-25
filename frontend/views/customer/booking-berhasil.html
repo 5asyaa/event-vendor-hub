@@ -9,24 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-gray-50 text-slate-900 font-['Inter'] min-h-screen flex flex-col">
-
-    <!-- NAVBAR STANDAR -->
-    <header class="bg-white border-b border-slate-100 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-            <a href="../public/index.html" class="flex items-center gap-2">
-                <div class="bg-[#F27024] p-2 rounded-xl text-white">
-                    <i class="fa-regular fa-calendar-days text-lg text-white"></i>
-                </div>
-                <span class="text-lg font-bold text-[#0F172A]">EventVendor<span class="text-[#F27024]">Hub</span></span>
-            </a>
-            <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-500">
-                <a href="pencarian-vendor.html" class="hover:text-[#0F172A] transition">Temukan Vendor</a>
-                <a href="pesanan-saya.html" class="hover:text-[#0F172A] transition">Pesanan Saya</a>
-            </nav>
-            <div id="auth-nav" class="flex items-center gap-3 text-sm font-semibold"></div>
-        </div>
-    </header>
-
     <main class="flex-grow flex items-center justify-center p-4">
     <div class="w-full max-w-xl bg-white rounded-2xl shadow-md border-t-4 border-orange-500 p-8 text-center space-y-6">
         <div class="w-12 h-12 bg-emerald-50 text-emerald-500 border border-emerald-100 rounded-full flex items-center justify-center text-xl mx-auto"><i class="fa-solid fa-check"></i></div>
@@ -57,27 +39,8 @@
             const session = JSON.parse(localStorage.getItem('session') || '{}');
             const token = session.token || '';
 
-            // Isi auth nav
-            (function() {
-                const nav = document.getElementById('auth-nav');
-                if (!nav) return;
-                if (session.token || session.isLoggedIn) {
-                    nav.innerHTML = `
-                        <a href="profil.html" class="text-slate-700 hover:text-[#F27024] transition flex items-center gap-1.5">
-                            <i class="fa-regular fa-user" style="color:#F27024"></i> Hai, ${(session.nama || 'User').split(' ')[0]}
-                        </a>
-                        <button onclick="localStorage.removeItem('session');window.location.href='../public/login.html';"
-                            class="text-sm font-semibold text-red-500 hover:text-red-700 transition flex items-center gap-1">
-                            <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
-                        </button>`;
-                } else {
-                    nav.innerHTML = `
-                        <a href="../public/login.html" class="text-sm font-semibold text-[#0F172A] px-4 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition">Login</a>
-                        <a href="../public/register.html" class="text-sm font-semibold text-white bg-[#0F172A] px-4 py-2 rounded-lg hover:bg-slate-800 shadow-sm transition">Register</a>`;
-                }
-            })();
-
-            // Selalu ambil id_booking dari URL — jangan gunakan localStorage
+            // Selalu ambil id_booking dari URL query string — JANGAN gunakan localStorage
+            // sebagai fallback karena bisa menampilkan booking milik orang lain / lama
             const urlParams = new URLSearchParams(window.location.search);
             const id_booking = urlParams.get('id_booking');
 
@@ -89,122 +52,117 @@
 
             document.getElementById('booking-id').innerText = "#EVH-" + id_booking;
 
-            // Tahap 1: Ambil data booking → dapatkan id_service & tanggal_event
-            // Tahap 2: Ambil data service dari id_service → dapatkan id_vendor & nama_paket
-            // Tahap 3: Ambil data vendor dari id_vendor → dapatkan nama_usaha
-            async function loadBookingDetails() {
-                try {
-                    const bookingRes = await fetch(`${window.location.origin}/bookings/${id_booking}`, {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    });
-                    if (!bookingRes.ok) throw new Error(`Booking tidak ditemukan (${bookingRes.status})`);
-                    const booking = await bookingRes.json();
-
-                    // Tampilkan tanggal event
-                    if (booking.tanggal_event) {
-                        try {
-                            document.getElementById('event-date').innerText =
-                                new Date(booking.tanggal_event).toLocaleDateString('id-ID', {
-                                    day: 'numeric', month: 'long', year: 'numeric'
-                                });
-                        } catch(e) {
-                            document.getElementById('event-date').innerText = booking.tanggal_event;
-                        }
-                    }
-
-                    // Ambil data service → nama paket & id_vendor
-                    if (booking.id_service) {
-                        try {
-                            const serviceRes = await fetch(`${window.location.origin}/services/${booking.id_service}`);
-                            if (serviceRes.ok) {
-                                const service = await serviceRes.json();
-                                document.getElementById('package-name').innerText =
-                                    service.nama_paket || service.nama || '-';
-
-                                // Ambil data vendor → nama usaha
-                                if (service.id_vendor) {
-                                    try {
-                                        const vendorRes = await fetch(`${window.location.origin}/vendors/${service.id_vendor}`);
-                                        if (vendorRes.ok) {
-                                            const vendor = await vendorRes.json();
-                                            document.getElementById('vendor-name').innerText =
-                                                vendor.nama_usaha || vendor.nama || '-';
-                                        }
-                                    } catch(e) {
-                                        console.warn("Gagal ambil data vendor:", e.message);
-                                    }
-                                }
-                            }
-                        } catch(e) {
-                            console.warn("Gagal ambil data service:", e.message);
-                        }
-                    }
-                } catch (err) {
-                    console.error("Gagal memuat detail booking:", err.message);
-                }
-            }
-
-            // Jalankan fetch detail (non-blocking, paralel dengan status payment)
-            loadBookingDetails();
+            // Load data dari API langsung berdasarkan id_booking dari URL
+            // Tidak menggunakan localStorage activeCheckout karena bisa stale / milik booking lain
 
             async function getStatus() {
                 try {
+                    // Fetch booking detail
+                    const bookingRes = await fetch(`${window.location.origin}/bookings/${id_booking}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (bookingRes.ok) {
+                        const bookingData = await bookingRes.json();
+                        document.getElementById('event-date').innerText = bookingData.tanggal_event;
+                    }
+
+                    // Fetch payment detail
                     const paymentRes = await fetch(`${window.location.origin}/payments/booking/${id_booking}`, {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
-                    if (!paymentRes.ok) return false;
-                    const paymentData = await paymentRes.json();
+                    if (paymentRes.ok) {
+                        const paymentData = await paymentRes.json();
+                        
+                        const jenisPembayaran =
+                            paymentData.jenis_pembayaran;
+                        const statusPembayaran =
+                            paymentData.status_pembayaran;
 
-                    const statusPembayaran = paymentData.status_pembayaran;
-                    const dpPaidAmount = paymentData.total_dibayar > 0
-                        ? paymentData.total_dibayar
-                        : (Math.round(Number(paymentData.jumlah_bayar)) || 0);
+                        const totalDibayar =
+                            paymentData.total_dibayar || 0;
 
-                    document.getElementById('dp-paid').innerText =
-                        "Rp " + Number(dpPaidAmount).toLocaleString('id-ID');
+                        document.getElementById('dp-paid').innerText =
+                            "Rp " +
+                            totalDibayar.toLocaleString('id-ID');
+                        
+                        if (statusPembayaran === "dp") {
+                            document.getElementById("payment-label").innerText =
+                                "Total DP Terbayar";
+                        }
 
-                    const statusEl = document.getElementById('payment-status');
+                        if (statusPembayaran === "lunas") {
+                            document.getElementById("payment-label").innerText =
+                                "Total Pembayaran";
+                        }
+                        // Gunakan format agregat baru
+                        const dpPaidAmount = paymentData.total_dibayar > 0 ? paymentData.total_dibayar : (Math.round(Number(paymentData.jumlah_bayar)) || 0);
+                        document.getElementById('dp-paid').innerText = "Rp " + dpPaidAmount.toLocaleString('id-ID');
+                        
+                        const statusEl =
+                            document.getElementById('payment-status');
 
-                    if (statusPembayaran === "dp") {
-                        document.getElementById("payment-label").innerText = "Total DP Terbayar";
-                        document.getElementById('status-title').innerText = "Pembayaran DP Berhasil!";
-                        document.getElementById('status-desc').innerText =
-                            "DP telah diterima. Sisa pembayaran dapat dilunasi sesuai kesepakatan dengan vendor.";
-                        statusEl.innerText = "DP Sudah Dibayar";
-                        statusEl.className = "font-bold text-orange-600";
-                        return true;
+                        if (statusPembayaran === "dp") {
+
+                            document.getElementById('status-title').innerText =
+                                "Pembayaran DP Berhasil!";
+
+                            document.getElementById('status-desc').innerText =
+                                "DP telah diterima. Sisa pembayaran dapat dilunasi sesuai kesepakatan dengan vendor.";
+
+                            statusEl.innerText =
+                                "DP Sudah Dibayar";
+
+                            statusEl.className =
+                                "font-bold text-orange-600";
+
+                            return true;
+                        }
+
+                        if (statusPembayaran === "lunas") {
+
+                            document.getElementById('status-title').innerText =
+                                "Pembayaran Lunas!";
+
+                            document.getElementById('status-desc').innerText =
+                                "Seluruh pembayaran telah diterima. Pesanan Anda telah lunas.";
+
+                            statusEl.innerText =
+                                "Lunas";
+
+                            statusEl.className =
+                                "font-bold text-emerald-600";
+
+                            return true;
+                        }
+
+                        statusEl.innerText =
+                            "Menunggu Pembayaran";
+
+                        statusEl.className =
+                            "font-bold text-yellow-600";
                     }
-
-                    if (statusPembayaran === "lunas") {
-                        document.getElementById("payment-label").innerText = "Total Pembayaran";
-                        document.getElementById('status-title').innerText = "Pembayaran Lunas!";
-                        document.getElementById('status-desc').innerText =
-                            "Seluruh pembayaran telah diterima. Pesanan Anda telah lunas.";
-                        statusEl.innerText = "Lunas";
-                        statusEl.className = "font-bold text-emerald-600";
-                        return true;
-                    }
-
-                    statusEl.innerText = "Menunggu Pembayaran";
-                    statusEl.className = "font-bold text-yellow-600";
                 } catch (err) {
                     console.error("Gagal mengambil data status pembayaran:", err);
                 }
-                return false;
+                return false; // Lanjut polling
             }
 
-            // Jalankan status awal
+            // Jalankan pencarian status awal
             const stopPolling = await getStatus();
-
+            
             // Polling jika status masih pending
             if (!stopPolling) {
                 const interval = setInterval(async () => {
                     const shouldStop = await getStatus();
-                    if (shouldStop) clearInterval(interval);
+                    if (shouldStop) {
+                        clearInterval(interval);
+                    }
                 }, 3000);
             }
         });
     </script>
+
+    </main>
 
     <footer class="bg-[#0B1221] text-white py-12 px-6 border-t border-slate-800 mt-auto">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
