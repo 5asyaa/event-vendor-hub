@@ -4,19 +4,21 @@ const { createProxyMiddleware } = require("http-proxy-middleware");
 
 const app = express();
 const path = require("path");
+const fs = require("fs");
 
 app.use(cors());
 
 // Serve static frontend files
-app.use(express.static(path.resolve(__dirname, "../../../frontend/views/public")));
+const frontendPath = path.resolve(__dirname, "../../../frontend/views/public");
+
+console.log("__dirname =", __dirname);
+console.log("frontendPath =", frontendPath);
+console.log("exists =", fs.existsSync(frontendPath));
+
+app.use(express.static(frontendPath));
 
 app.get("/", (req, res) => {
-  res.sendFile(
-    path.join(
-      __dirname,
-      "../../../frontend/views/public/index.html"
-    )
-  );
+  res.sendFile(path.join(frontendPath, "index.html"));
 });
 
 // Service URLs — pakai env variable di production, fallback ke localhost untuk dev
