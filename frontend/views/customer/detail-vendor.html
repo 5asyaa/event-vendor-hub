@@ -84,26 +84,30 @@
                 </div>
                 <div id="package-list" class="space-y-4">
                 </div>
+            </div>
 
-                <!-- ── ULASAN PELANGGAN ── -->
-                <div class="bg-white p-6 rounded-2xl border border-gray-100 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h3 class="font-bold text-lg text-slate-900">Ulasan Pelanggan</h3>
-                        <span id="review-summary" class="text-xs text-gray-400 font-medium"></span>
-                    </div>
-                    <div id="review-list" class="space-y-4">
-                        <p class="text-xs text-gray-400">Memuat ulasan...</p>
-                    </div>
+            <!-- Sidebar: Booking -->
+            <div class="lg:sticky lg:top-24">
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-md space-y-4">
+                    <span class="text-xs text-gray-400 block font-bold uppercase tracking-wider">Mulai Dari</span>
+                    <span class="text-2xl font-black text-slate-900 block" id="price-display">Rp 8.500.000</span>
+                    <form class="space-y-3" id="booking-form" onsubmit="event.preventDefault(); handleBooking();">
+                        <select id="package-select" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-3 text-xs font-medium focus:ring-1 focus:ring-brand-orange focus:border-brand-orange outline-none">
+                        </select>
+                        <button type="submit" class="w-full bg-brand-darkBlue hover:bg-slate-800 text-white font-semibold py-3.5 rounded-xl text-sm transition shadow-md">Booking Sekarang</button>
+                    </form>
                 </div>
+            </div>
+        </div>
 
-            <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-md space-y-4">
-                <span class="text-xs text-gray-400 block font-bold uppercase tracking-wider">Mulai Dari</span>
-                <span class="text-2xl font-black text-slate-900 block" id="price-display">Rp 8.500.000</span>
-                <form class="space-y-3" id="booking-form" onsubmit="event.preventDefault(); handleBooking();">
-                    <select id="package-select" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-3 text-xs font-medium focus:ring-1 focus:ring-brand-orange focus:border-brand-orange outline-none">
-                    </select>
-                    <button type="submit" class="w-full bg-brand-darkBlue hover:bg-slate-800 text-white font-semibold py-3.5 rounded-xl text-sm transition shadow-md">Booking Sekarang</button>
-                </form>
+        <!-- ── ULASAN PELANGGAN — full width di bawah ── -->
+        <div class="bg-white p-6 rounded-2xl border border-gray-100 space-y-5 mb-10">
+            <div class="flex items-center justify-between border-b border-gray-50 pb-4">
+                <h3 class="font-bold text-xl text-slate-900">Ulasan Pelanggan</h3>
+                <span id="review-summary" class="text-sm text-amber-500 font-semibold"></span>
+            </div>
+            <div id="review-list" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <p class="text-xs text-gray-400 col-span-2">Memuat ulasan...</p>
             </div>
         </div>
     </main>
@@ -226,13 +230,13 @@
             const reviews = await res.json();
 
             if (!reviews.length) {
-                reviewList.innerHTML = `<p class="text-xs text-gray-400 italic">Belum ada ulasan untuk vendor ini.</p>`;
+                reviewList.innerHTML = `<p class="text-sm text-gray-400 italic col-span-2">Belum ada ulasan untuk vendor ini.</p>`;
                 return;
             }
 
             // Hitung rata-rata rating
             const avgRating = (reviews.reduce((s, r) => s + Number(r.skor_rating), 0) / reviews.length).toFixed(1);
-            reviewSummary.textContent = `${avgRating} ★ · ${reviews.length} ulasan`;
+            reviewSummary.textContent = `★ ${avgRating}  ·  ${reviews.length} ulasan`;
 
             // Ambil nama reviewer dari auth-service secara paralel
             const userIds   = [...new Set(reviews.map(r => r.id_user))];
@@ -245,34 +249,39 @@
                 } catch { userNames[uid] = `Pelanggan #${uid}`; }
             }));
 
-            const STAR_COLORS = ['', '#ef4444','#f97316','#eab308','#84cc16','#22c55e'];
-
             reviewList.innerHTML = reviews.map(r => {
                 const nama    = userNames[r.id_user] || `Pelanggan #${r.id_user}`;
                 const inisial = nama.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
-                const skor    = Number(r.skor_rating) || 0;
-                const bintang = '★'.repeat(skor) + '☆'.repeat(5 - skor);
+                const skor    = Math.min(5, Math.max(0, Number(r.skor_rating) || 0));
+                const bintangPenuh  = '★'.repeat(skor);
+                const bintangKosong = '☆'.repeat(5 - skor);
                 const tanggal = r.tanggal_review
-                    ? new Date(r.tanggal_review).toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' })
+                    ? new Date(r.tanggal_review).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' })
                     : '';
 
+                // Warna avatar berdasarkan inisial (konsisten per user)
+                const hue = [...nama].reduce((acc, c) => acc + c.charCodeAt(0), 0) % 360;
+
                 return `
-                <div class="flex gap-3 pb-4 border-b border-gray-50 last:border-0 last:pb-0">
-                    <div class="w-9 h-9 rounded-full bg-slate-800 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">${inisial}</div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center justify-between gap-2">
-                            <span class="text-sm font-bold text-slate-900 truncate">${nama}</span>
-                            <span class="text-[11px] text-gray-400 flex-shrink-0">${tanggal}</span>
+                <div class="bg-gray-50 rounded-2xl p-4 space-y-3 border border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-full text-white text-xs font-bold flex items-center justify-center flex-shrink-0"
+                             style="background:hsl(${hue},50%,40%)">${inisial}</div>
+                        <div class="flex-1 min-w-0">
+                            <span class="text-sm font-bold text-slate-900 block truncate">${nama}</span>
+                            <span class="text-[11px] text-gray-400">${tanggal}</span>
                         </div>
-                        <div class="text-sm mt-0.5" style="color:${STAR_COLORS[skor] || '#94a3b8'}">${bintang}</div>
-                        <p class="text-sm text-gray-600 mt-1 leading-relaxed">${r.komentar || '<em class="text-gray-400">Tidak ada komentar.</em>'}</p>
                     </div>
+                    <div>
+                        <span class="text-base text-amber-400">${bintangPenuh}</span><span class="text-base text-gray-300">${bintangKosong}</span>
+                    </div>
+                    <p class="text-sm text-gray-600 leading-relaxed">${r.komentar || '<em class="text-gray-400 text-xs">Tidak ada komentar.</em>'}</p>
                 </div>`;
             }).join('');
 
         } catch (err) {
             console.error(err);
-            reviewList.innerHTML = `<p class="text-xs text-red-400">Gagal memuat ulasan.</p>`;
+            reviewList.innerHTML = `<p class="text-xs text-red-400 col-span-2">Gagal memuat ulasan.</p>`;
         }
     }
 
