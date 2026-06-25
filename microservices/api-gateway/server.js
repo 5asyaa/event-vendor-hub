@@ -22,6 +22,7 @@ console.log("exists       =", fs.existsSync(frontendPath));
 //   /vendor/...   → views/vendor/...
 //   /admin/...    → views/admin/...
 app.use(express.static(path.join(frontendPath, "public")));
+app.use("/public",   express.static(path.join(frontendPath, "public")));
 app.use("/customer", express.static(path.join(frontendPath, "customer")));
 app.use("/vendor",   express.static(path.join(frontendPath, "vendor")));
 app.use("/admin",    express.static(path.join(frontendPath, "admin")));
