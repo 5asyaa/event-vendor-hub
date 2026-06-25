@@ -8,7 +8,16 @@ const path = require("path");
 app.use(cors());
 
 // Serve static frontend files
-app.use(express.static(path.join(__dirname, "../../../frontend")));
+app.use(express.static(path.join(__dirname, "../../../frontend/view/public")));
+
+app.get("/", (req, res) => {
+  res.sendFile(
+    path.join(
+      __dirname,
+      "../../../frontend/views/public/index.html"
+    )
+  );
+});
 
 // Service URLs — pakai env variable di production, fallback ke localhost untuk dev
 const AUTH_URL    = process.env.AUTH_URL    || "http://localhost:3001";
