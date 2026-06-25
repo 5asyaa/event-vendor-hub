@@ -39,67 +39,21 @@
             const session = JSON.parse(localStorage.getItem('session') || '{}');
             const token = session.token || '';
 
+            // Selalu ambil id_booking dari URL query string — JANGAN gunakan localStorage
+            // sebagai fallback karena bisa menampilkan booking milik orang lain / lama
             const urlParams = new URLSearchParams(window.location.search);
-            let id_booking = urlParams.get('id_booking');
-            if (!id_booking) {
-                id_booking = localStorage.getItem("id_booking");
-            }
+            const id_booking = urlParams.get('id_booking');
 
             if (!id_booking) {
-                document.getElementById('status-desc').innerText = "ID Booking tidak terdeteksi. Silakan periksa riwayat pesanan Anda.";
+                document.getElementById('status-title').innerText = "ID Booking Tidak Ditemukan";
+                document.getElementById('status-desc').innerText = "Silakan periksa riwayat pesanan Anda.";
                 return;
             }
 
-            document.getElementById('booking-id').innerText = "#EVH-BOOKING-" + id_booking;
+            document.getElementById('booking-id').innerText = "#EVH-" + id_booking;
 
-            // Load data dasar dari localStorage agar cepat terisi di UI
-            // Load data dasar dari localStorage agar cepat terisi di UI (fallback)
-            const activeCheckout =
-                JSON.parse(
-                    localStorage.getItem("activeCheckout") || "{}"
-                );
-
-            document.getElementById('vendor-name').innerText =
-                activeCheckout.vendorName || activeCheckout.nama_vendor || "-";
-
-            document.getElementById('package-name').innerText =
-                activeCheckout.packageName || activeCheckout.nama_paket || "-";
-
-            document.getElementById('event-date').innerText =
-                activeCheckout.tanggal_event || "-";
-
-            document.getElementById('dp-paid').innerText =
-                "Rp " +
-                Math.round(
-                    Number(activeCheckout.dpRequired || 0)
-                ).toLocaleString('id-ID');
-
-            // Ambil detail data secara dinamis dari database sesuai booking ID
-            if (id_booking) {
-                fetch(`${window.location.origin}/bookings/${id_booking}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                })
-                    .then(res => res.json())
-                    .then(bookingData => {
-                        if (bookingData && bookingData.id_service) {
-                            fetch(`${window.location.origin}/services`)
-                                .then(res => res.json())
-                                .then(services => {
-                                    const service = services.find(s => s.id_service == bookingData.id_service);
-                                    if (service) {
-                                        document.getElementById('package-name').innerText = service.nama_paket;
-                                        fetch(`${window.location.origin}/vendors/${service.id_vendor}`)
-                                            .then(res => res.json())
-                                            .then(vendor => {
-                                                if (vendor) {
-                                                    document.getElementById('vendor-name').innerText = vendor.nama_usaha;
-                                                }
-                                            }).catch(err => console.log("Gagal fetch vendor", err));
-                                    }
-                                }).catch(err => console.log("Gagal fetch services", err));
-                        }
-                    }).catch(err => console.log("Gagal fetch booking", err));
-            }
+            // Load data dari API langsung berdasarkan id_booking dari URL
+            // Tidak menggunakan localStorage activeCheckout karena bisa stale / milik booking lain
 
             async function getStatus() {
                 try {

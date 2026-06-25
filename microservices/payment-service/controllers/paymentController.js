@@ -26,8 +26,8 @@ exports.createPayment = async (req, res) => {
         description: `Pembayaran Booking #${id_booking}`,
         currency: "IDR",
         invoiceDuration: 86400, // 24 jam
-        successRedirectUrl: `${process.env.FRONTEND_BASE_URL || 'http://localhost:3000'}/views/customer/booking-berhasil.html?id_booking=${id_booking}`,
-        failureRedirectUrl: `${process.env.FRONTEND_BASE_URL || 'http://localhost:3000'}/views/customer/pembayaran.html?id_booking=${id_booking}&status=failed`
+        successRedirectUrl: `${process.env.FRONTEND_BASE_URL}/customer/booking-berhasil.html?id_booking=${id_booking}`,
+        failureRedirectUrl: `${process.env.FRONTEND_BASE_URL}/customer/pembayaran.html?id_booking=${id_booking}&status=failed`
       }
     });
 
