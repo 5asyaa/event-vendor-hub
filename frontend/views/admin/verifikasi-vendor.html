@@ -119,6 +119,9 @@
 const API = window.location.origin;
 let allVendors = [];
 let allServices = [];
+let currentPageAdmin = 1;
+const PAGE_SIZE_ADMIN = 10;
+let filteredAdminList = [];
 
 function doLogout() { localStorage.removeItem('session'); window.location.href = '../public/login.html'; }
 
@@ -137,13 +140,14 @@ function filterVendors() {
     const statusSel = document.getElementById('filter-status');
     const statusFilter = statusSel ? statusSel.value : '';
 
-    const filtered = allVendors.filter(v => {
+    filteredAdminList = allVendors.filter(v => {
         const matchQ = !q || (v.nama_usaha || '').toLowerCase().includes(q) || (v.jenis_jasa || '').toLowerCase().includes(q) || (v.alamat || '').toLowerCase().includes(q);
         const matchCat = !cat || v.jenis_jasa === cat;
         const matchStatus = !statusFilter || (v.status_verifikasi || 'pending') === statusFilter;
         return matchQ && matchCat && matchStatus;
     });
-    renderVendors(filtered);
+    currentPageAdmin = 1;
+    renderVendors(filteredAdminList);
 }
 
 function renderVendors(vendors) {
@@ -152,7 +156,12 @@ function renderVendors(vendors) {
         list.innerHTML = `<div class="flex flex-col items-center justify-center py-16 text-slate-400"><i class="fa-regular fa-folder-open text-4xl mb-3 text-slate-300"></i><p class="text-sm">Tidak ada vendor ditemukan.</p></div>`;
         return;
     }
-    list.innerHTML = vendors.map(v => {
+
+    const totalPages = Math.ceil(vendors.length / PAGE_SIZE_ADMIN);
+    const start = (currentPageAdmin - 1) * PAGE_SIZE_ADMIN;
+    const pageItems = vendors.slice(start, start + PAGE_SIZE_ADMIN);
+
+    let html = pageItems.map(v => {
         const svcCount = allServices.filter(s => Number(s.id_vendor) === Number(v.id_vendor)).length;
         const initials = (v.nama_usaha || '?').substring(0, 2).toUpperCase();
         const rating   = v.rating_avg ? `⭐ ${v.rating_avg}` : 'Belum ada rating';
@@ -198,6 +207,23 @@ function renderVendors(vendors) {
                 </div>`}
             </div>`;
     }).join('');
+
+    if (totalPages > 1) {
+        html += `
+        <div class="flex justify-center items-center gap-3 mt-8">
+            <button onclick="changePageAdmin(-1)" ${currentPageAdmin === 1 ? 'disabled' : ''} class="px-4 py-2 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition"><i class="fa-solid fa-chevron-left"></i></button>
+            <span class="text-sm font-semibold text-slate-500">Hal ${currentPageAdmin} dari ${totalPages}</span>
+            <button onclick="changePageAdmin(1)" ${currentPageAdmin === totalPages ? 'disabled' : ''} class="px-4 py-2 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>`;
+    }
+
+    list.innerHTML = html;
+}
+
+function changePageAdmin(direction) {
+    currentPageAdmin += direction;
+    renderVendors(filteredAdminList);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 async function updateStatus(id_vendor, status, btn) {
@@ -275,7 +301,9 @@ async function loadVendors() {
         const categories = [...new Set(allVendors.map(v => v.jenis_jasa).filter(Boolean))];
         categories.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; sel.appendChild(o); });
 
-        renderVendors(allVendors);
+        filteredAdminList = [...allVendors];
+        currentPageAdmin = 1;
+        renderVendors(filteredAdminList);
     } catch (err) {
         console.error(err);
         showToast('Gagal memuat data vendor.', 'error');
