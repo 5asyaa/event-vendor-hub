@@ -346,7 +346,7 @@
                 const lokasiV = (v.alamat     || '').toLowerCase();
                 const rating  = Number(v.rating_avg) || 0;
 
-                if (query && !nama.includes(query) && !desk.includes(query) && !jenis.includes(query)) return false;
+                if (query && !nama.includes(query) && !desk.includes(query) && !jenis.includes(query) && !lokasiV.includes(query)) return false;
                 if (lokasi && !lokasiV.includes(lokasi)) return false;
                 if (v._minHarga > 0) {
                     if (budgetMin > 0 && v._minHarga < budgetMin) return false;
