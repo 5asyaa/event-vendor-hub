@@ -134,7 +134,7 @@ function showToast(msg, type = 'success') {
     setTimeout(() => t.classList.add('hidden'), 3000);
 }
 
-function filterVendors() {
+function filterVendors(resetPage = true) {
     const q = document.getElementById('search-input').value.toLowerCase();
     const cat = document.getElementById('filter-category').value;
     const statusSel = document.getElementById('filter-status');
@@ -146,7 +146,15 @@ function filterVendors() {
         const matchStatus = !statusFilter || (v.status_verifikasi || 'pending') === statusFilter;
         return matchQ && matchCat && matchStatus;
     });
-    currentPageAdmin = 1;
+    
+    if (resetPage) {
+        currentPageAdmin = 1;
+    } else {
+        const totalPages = Math.ceil(filteredAdminList.length / PAGE_SIZE_ADMIN) || 1;
+        if (currentPageAdmin > totalPages) {
+            currentPageAdmin = totalPages;
+        }
+    }
     renderVendors(filteredAdminList);
 }
 
@@ -248,8 +256,8 @@ async function updateStatus(id_vendor, status, btn) {
 
         showToast(`Vendor berhasil di-${label.toLowerCase()}!`, status === 'approved' ? 'success' : 'error');
 
-        // Reload data setelah update
-        setTimeout(loadVendors, 800);
+        // Reload data setelah update secara silent dan preserve state
+        setTimeout(() => loadVendors(false, true), 800);
 
     } catch (err) {
         showToast(err.message, 'error');
@@ -258,8 +266,10 @@ async function updateStatus(id_vendor, status, btn) {
     }
 }
 
-async function loadVendors() {
-    document.getElementById('vendor-list').innerHTML = `<div class="flex justify-center py-12"><div class="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div></div>`;
+async function loadVendors(showSpinner = true, keepState = false) {
+    if (showSpinner) {
+        document.getElementById('vendor-list').innerHTML = `<div class="flex justify-center py-12"><div class="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div></div>`;
+    }
     try {
         const session = JSON.parse(localStorage.getItem('session') || '{}');
         if (!session.isLoggedIn || session.role !== 'admin') { window.location.href = '../public/login.html'; return; }
@@ -274,14 +284,14 @@ async function loadVendors() {
 
         if (vRes.status === 401) { localStorage.removeItem('session'); window.location.href = '../public/login.html'; return; }
 
-        [allVendors, allServices] = await Promise.all([
-            vRes.ok ? vRes.json() : [],
-            sRes.ok ? sRes.json() : []
-        ]);
+        let newVendors = vRes.ok ? await vRes.json() : [];
+        let newServices = sRes.ok ? await sRes.json() : [];
 
-        // Pastikan allVendors adalah array
-        if (!Array.isArray(allVendors)) allVendors = [];
-        if (!Array.isArray(allServices)) allServices = [];
+        if (!Array.isArray(newVendors)) newVendors = [];
+        if (!Array.isArray(newServices)) newServices = [];
+
+        allVendors = newVendors;
+        allServices = newServices;
 
         // Hitung vendor pending untuk badge
         const pendingCount = allVendors.filter(v => (v.status_verifikasi || 'pending') === 'pending').length;
@@ -297,20 +307,26 @@ async function loadVendors() {
 
         // Isi filter kategori (reset dulu agar tidak duplikat saat refresh)
         const sel = document.getElementById('filter-category');
+        const currentCat = sel.value;
         sel.innerHTML = '<option value="">Semua Kategori</option>';
         const categories = [...new Set(allVendors.map(v => v.jenis_jasa).filter(Boolean))];
         categories.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; sel.appendChild(o); });
+        sel.value = currentCat;
 
-        filteredAdminList = [...allVendors];
-        currentPageAdmin = 1;
-        renderVendors(filteredAdminList);
+        filterVendors(!keepState);
     } catch (err) {
         console.error(err);
-        showToast('Gagal memuat data vendor.', 'error');
+        if (showSpinner) {
+            showToast('Gagal memuat data vendor.', 'error');
+        }
     }
 }
 
-document.addEventListener('DOMContentLoaded', loadVendors);
+document.addEventListener('DOMContentLoaded', () => {
+    loadVendors();
+    // Auto-refresh silent setiap 5 detik untuk mendeteksi data baru tanpa interupsi
+    setInterval(() => loadVendors(false, true), 5000);
+});
 </script>
 </body>
 </html>
