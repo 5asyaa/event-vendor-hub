@@ -233,6 +233,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         label.textContent = 'Menyimpan...';
         this.disabled = true;
 
+        const token = session.token || '';
         let hasError = false;
 
         // 1. Update data user (nama, no_hp, password) via auth-service
@@ -244,7 +245,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 
             const userRes = await fetch(`${API}/auth/users/${session.id}`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify(body)
             });
 
@@ -254,13 +258,21 @@ document.addEventListener('DOMContentLoaded', async function() {
             }
 
             // Refresh dari backend dan update tampilan
-            const updated = await fetch(`${API}/auth/users/${session.id}`).then(r => r.json());
-            document.getElementById('field-nama').value = updated.nama  || '';
-            document.getElementById('field-hp').value   = updated.no_hp || '';
+            const updated = await fetch(`${API}/auth/users/${session.id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            }).then(r => r.ok ? r.json() : null);
 
-            // Update session lokal
-            const updatedSession = { ...session, nama: updated.nama || nama };
-            localStorage.setItem('session', JSON.stringify(updatedSession));
+            if (updated) {
+                document.getElementById('field-nama').value = updated.nama  || '';
+                document.getElementById('field-hp').value   = updated.no_hp || '';
+                // Update session lokal
+                const updatedSession = { ...session, nama: updated.nama || nama };
+                localStorage.setItem('session', JSON.stringify(updatedSession));
+            } else {
+                // fallback: pakai nilai dari form
+                const updatedSession = { ...session, nama };
+                localStorage.setItem('session', JSON.stringify(updatedSession));
+            }
 
             // Reset password fields
             document.getElementById('field-newpass').value    = '';
@@ -269,6 +281,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             hasError = true;
             console.error('Gagal update user:', e.message);
         }
+
 
         // 2. Update data vendor (nama_usaha, jenis_jasa, alamat, deskripsi)
         if (currentVendor) {
