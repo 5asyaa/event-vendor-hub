@@ -103,7 +103,7 @@
                 <form id="forgotPasswordForm" class="space-y-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Alamat Email</label>
-                        <input type="email" required placeholder="nama@perusahaan.com"
+                        <input type="email" id="resetEmail" required placeholder="nama@perusahaan.com"
                             class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-3 pr-4 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-orange-500">
                     </div>
                     <div>
@@ -243,27 +243,60 @@
             if (e.target === modal) modal.classList.add('hidden');
         });
 
-        document.getElementById('forgotPasswordForm').addEventListener('submit', function(e) {
+        document.getElementById('forgotPasswordForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            const email  = document.getElementById('resetEmail').value.trim();
             const newPw  = document.getElementById('newPassword').value;
             const confPw = document.getElementById('confirmNewPassword').value;
             const errEl  = document.getElementById('modal-error');
             const sucEl  = document.getElementById('modal-success');
+            const submitBtn = this.querySelector('button[type="submit"]');
 
             errEl.classList.add('hidden');
             sucEl.classList.add('hidden');
 
             if (newPw !== confPw) {
+                errEl.textContent = 'Kata sandi baru tidak cocok!';
+                errEl.classList.remove('hidden');
+                return;
+            }
+            if (newPw.length < 6) {
+                errEl.textContent = 'Kata sandi minimal 6 karakter!';
                 errEl.classList.remove('hidden');
                 return;
             }
 
-            sucEl.classList.remove('hidden');
-            setTimeout(function() {
-                modal.classList.add('hidden');
-                document.getElementById('forgotPasswordForm').reset();
-                sucEl.classList.add('hidden');
-            }, 2000);
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Menyimpan...';
+
+            try {
+                const res = await fetch(API + '/auth/reset-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password: newPw })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    errEl.textContent = data.message || 'Gagal mengubah kata sandi.';
+                    errEl.classList.remove('hidden');
+                } else {
+                    sucEl.textContent = data.message || 'Kata sandi berhasil diubah! Silakan login.';
+                    sucEl.classList.remove('hidden');
+                    document.getElementById('forgotPasswordForm').reset();
+                    setTimeout(function() {
+                        modal.classList.add('hidden');
+                        sucEl.classList.add('hidden');
+                    }, 2500);
+                }
+            } catch(err) {
+                errEl.textContent = 'Terjadi kesalahan. Periksa koneksi internet Anda.';
+                errEl.classList.remove('hidden');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Simpan Kata Sandi Baru';
+            }
         });
     });
     </script>

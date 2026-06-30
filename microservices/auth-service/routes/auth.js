@@ -43,4 +43,10 @@ router.patch(
   authController.updateProfile
 );
 
+// RESET PASSWORD BY EMAIL (lupa sandi — tanpa token)
+router.post(
+  "/reset-password",
+  authController.resetPasswordByEmail
+);
+
 module.exports = router;

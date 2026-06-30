@@ -13,38 +13,12 @@ exports.register = (req, res) => {
     db.query(
       "INSERT INTO users (nama, email, password, role, no_hp) VALUES (?, ?, ?, ?, ?)",
       [nama, email, hashedPassword, role, no_hp || null],
-      async (err, result) => {
+      (err, result) => {
         if (err) return res.status(500).json(err);
-
-        const userId = result.insertId;
-
-        // Jika role vendor, buat profile vendor otomatis ke vendor-service
-        if (role === 'vendor') {
-          const vendorServiceUrl = process.env.VENDOR_SERVICE_URL || 'http://localhost:3002';
-          try {
-            const vRes = await fetch(`${vendorServiceUrl}/vendors`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                id_user: userId,
-                nama_usaha: nama,
-                link_whatsapp: no_hp || null
-              })
-            });
-            if (!vRes.ok) {
-              const errBody = await vRes.json().catch(() => ({}));
-              console.error('Gagal create vendor profile:', errBody);
-            } else {
-              console.log('Vendor profile created successfully for user_id:', userId);
-            }
-          } catch (fetchErr) {
-            console.error('Koneksi ke vendor-service gagal saat registrasi:', fetchErr.message);
-          }
-        }
 
         res.json({
           message: "Register berhasil",
-          user_id: userId
+          user_id: result.insertId
         });
       }
     );
@@ -210,3 +184,38 @@ exports.updateProfile = (req, res) => {
     );
   }
 };
+
+// ================= RESET PASSWORD BY EMAIL (tanpa token) =================
+exports.resetPasswordByEmail = (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: "Email dan password wajib diisi" });
+  }
+  if (password.length < 6) {
+    return res.status(400).json({ message: "Password minimal 6 karakter" });
+  }
+
+  // Cari user berdasarkan email
+  db.query(
+    "SELECT id_user FROM users WHERE email = ?",
+    [email.toLowerCase().trim()],
+    (err, result) => {
+      if (err) return res.status(500).json({ message: "Terjadi kesalahan server", error: err });
+      if (result.length === 0) return res.status(404).json({ message: "Email tidak terdaftar" });
+
+      const id_user = result[0].id_user;
+      const salt = bcrypt.genSaltSync(10);
+      const hashedPassword = bcrypt.hashSync(password, salt);
+
+      db.query(
+        "UPDATE users SET password = ? WHERE id_user = ?",
+        [hashedPassword, id_user],
+        (err2, result2) => {
+          if (err2) return res.status(500).json({ message: "Gagal update password", error: err2 });
+          res.json({ message: "Kata sandi berhasil diubah! Silakan login dengan kata sandi baru." });
+        }
+      );
+    }
+  );
+};
