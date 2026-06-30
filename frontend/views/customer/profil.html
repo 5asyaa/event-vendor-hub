@@ -63,8 +63,9 @@
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-600 mb-1">Email</label>
-                <input id="field-email" type="email" placeholder="email@contoh.com"
-                    class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                <input id="field-email" type="email" disabled
+                    class="w-full bg-gray-100 border border-gray-200 rounded-xl py-2.5 px-3 text-sm text-gray-400 cursor-not-allowed">
+
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-600 mb-1">Nomor HP</label>
@@ -184,10 +185,15 @@
             const body = { nama, no_hp };
             if (newpass) body.password = newpass;
 
+            const token = session.token || '';
+
             try {
                 const res = await fetch(`${API}/auth/users/${session.id}`, {
                     method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
                     body: JSON.stringify(body)
                 });
 
@@ -197,7 +203,11 @@
                 }
 
                 // Refresh data dari backend
-                const updated = await fetch(`${API}/auth/users/${session.id}`).then(r => r.json());
+                const updated = await fetch(`${API}/auth/users/${session.id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }).then(r => r.ok ? r.json() : null);
+                if (!updated) throw new Error('Gagal refresh data');
+
                 document.getElementById('display-name').textContent  = updated.nama  || nama;
                 document.getElementById('display-email').textContent = updated.email || '';
                 document.getElementById('field-nama').value  = updated.nama  || '';
