@@ -13,12 +13,38 @@ exports.register = (req, res) => {
     db.query(
       "INSERT INTO users (nama, email, password, role, no_hp) VALUES (?, ?, ?, ?, ?)",
       [nama, email, hashedPassword, role, no_hp || null],
-      (err, result) => {
+      async (err, result) => {
         if (err) return res.status(500).json(err);
+
+        const userId = result.insertId;
+
+        // Jika role vendor, buat profile vendor otomatis ke vendor-service
+        if (role === 'vendor') {
+          const vendorServiceUrl = process.env.VENDOR_SERVICE_URL || 'http://localhost:3002';
+          try {
+            const vRes = await fetch(`${vendorServiceUrl}/vendors`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                id_user: userId,
+                nama_usaha: nama,
+                link_whatsapp: no_hp || null
+              })
+            });
+            if (!vRes.ok) {
+              const errBody = await vRes.json().catch(() => ({}));
+              console.error('Gagal create vendor profile:', errBody);
+            } else {
+              console.log('Vendor profile created successfully for user_id:', userId);
+            }
+          } catch (fetchErr) {
+            console.error('Koneksi ke vendor-service gagal saat registrasi:', fetchErr.message);
+          }
+        }
 
         res.json({
           message: "Register berhasil",
-          user_id: result.insertId
+          user_id: userId
         });
       }
     );
