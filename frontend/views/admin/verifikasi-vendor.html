@@ -256,8 +256,8 @@ async function updateStatus(id_vendor, status, btn) {
 
         showToast(`Vendor berhasil di-${label.toLowerCase()}!`, status === 'approved' ? 'success' : 'error');
 
-        // Reload data setelah update secara silent dan preserve state
-        setTimeout(() => loadVendors(false, true), 800);
+        // Reload data setelah update — reset state agar vendor yang diverifikasi langsung hilang dari filter pending
+        setTimeout(() => loadVendors(false, false), 800);
 
     } catch (err) {
         showToast(err.message, 'error');
