@@ -89,7 +89,7 @@
             </select>
             <select id="filter-status" onchange="filterVendors()" class="bg-slate-50 border border-gray-200 rounded-lg py-2.5 px-3 text-sm focus:outline-none">
                 <option value="">Semua Status</option>
-                <option value="pending">Menunggu Verifikasi</option>
+                <option value="pending" selected>Menunggu Verifikasi</option>
                 <option value="approved">Terverifikasi</option>
                 <option value="rejected">Ditolak</option>
             </select>
@@ -289,6 +289,16 @@ async function loadVendors(showSpinner = true, keepState = false) {
 
         if (!Array.isArray(newVendors)) newVendors = [];
         if (!Array.isArray(newServices)) newServices = [];
+
+        // Urutkan: pending terbaru di atas, lalu approved/rejected di bawah
+        const statusOrder = { pending: 0, approved: 1, rejected: 2 };
+        newVendors.sort((a, b) => {
+            const sa = statusOrder[a.status_verifikasi || 'pending'] ?? 1;
+            const sb = statusOrder[b.status_verifikasi || 'pending'] ?? 1;
+            if (sa !== sb) return sa - sb;
+            // Dalam grup yang sama, terbaru (id terbesar) di atas
+            return Number(b.id_vendor) - Number(a.id_vendor);
+        });
 
         allVendors = newVendors;
         allServices = newServices;
